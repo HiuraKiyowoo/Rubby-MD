@@ -1,205 +1,20 @@
 <div align="center">
 
-<!-- HERO BANNER SVG -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" width="100%" height="auto" style="max-width: 1000px; display: block; margin: auto;">
-  <defs>
-    <!-- Background Gradient -->
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#08070d"/>
-      <stop offset="40%" stop-color="#0f0c1b"/>
-      <stop offset="80%" stop-color="#07060a"/>
-      <stop offset="100%" stop-color="#020204"/>
-    </linearGradient>
-
-    <!-- Border Gradient -->
-    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#c084fc" stop-opacity="0.8"/>
-      <stop offset="35%" stop-color="#a855f7" stop-opacity="0.3"/>
-      <stop offset="70%" stop-color="#6366f1" stop-opacity="0.2"/>
-      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.6"/>
-    </linearGradient>
-
-    <!-- Core Glow & Gradient -->
-    <linearGradient id="coreGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#e879f9"/>
-      <stop offset="50%" stop-color="#a855f7"/>
-      <stop offset="100%" stop-color="#6366f1"/>
-    </linearGradient>
-
-    <!-- Accent Silver -->
-    <linearGradient id="silverGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#94a3b8"/>
-    </linearGradient>
-
-    <!-- Device Glass Gradient -->
-    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2e1065" stop-opacity="0.4"/>
-      <stop offset="100%" stop-color="#0f0728" stop-opacity="0.7"/>
-    </linearGradient>
-
-    <!-- Filters for Bloom -->
-    <filter id="purpleGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="16" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-
-    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="6" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-
-    <!-- Subtle Grid Pattern -->
-    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#7e22ce" stroke-width="1" stroke-opacity="0.07"/>
-    </pattern>
-  </defs>
-
-  <style>
-    .title-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 900; letter-spacing: 4px; }
-    .sub-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 500; letter-spacing: 1.5px; }
-    .mono-text { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; font-size: 11px; }
-  </style>
-
-  <!-- Background Canvas -->
-  <rect width="1000" height="420" rx="24" fill="url(#bgGrad)"/>
-  <rect width="1000" height="420" rx="24" fill="url(#grid)"/>
-  <rect width="998" height="418" x="1" y="1" rx="23" fill="none" stroke="url(#borderGrad)" stroke-width="1.5"/>
-
-  <!-- Ambient Light Circles -->
-  <circle cx="200" cy="120" r="140" fill="#a855f7" fill-opacity="0.12" filter="url(#purpleGlow)"/>
-  <circle cx="800" cy="280" r="160" fill="#6366f1" fill-opacity="0.10" filter="url(#purpleGlow)"/>
-  <circle cx="500" cy="210" r="100" fill="#ec4899" fill-opacity="0.06" filter="url(#purpleGlow)"/>
-
-  <!-- Multi-Device Connectivity Schematic (Right Side) -->
-  <g transform="translate(680, 205)">
-    <!-- Orbital Connection Rings -->
-    <circle cx="0" cy="0" r="125" fill="none" stroke="#a855f7" stroke-width="1" stroke-dasharray="4,6" stroke-opacity="0.25"/>
-    <circle cx="0" cy="0" r="85" fill="none" stroke="#6366f1" stroke-width="1" stroke-dasharray="6,4" stroke-opacity="0.35"/>
-
-    <!-- Dynamic Vector Connection Lines -->
-    <line x1="0" y1="0" x2="-80" y2="-65" stroke="url(#coreGlow)" stroke-width="1.5" stroke-opacity="0.7"/>
-    <line x1="0" y1="0" x2="85" y2="-55" stroke="url(#coreGlow)" stroke-width="1.5" stroke-opacity="0.7"/>
-    <line x1="0" y1="0" x2="-75" y2="70" stroke="url(#coreGlow)" stroke-width="1.5" stroke-opacity="0.7"/>
-    <line x1="0" y1="0" x2="80" y2="65" stroke="url(#coreGlow)" stroke-width="1.5" stroke-opacity="0.7"/>
-
-    <!-- Central Node (Server / Engine Hub) -->
-    <circle cx="0" cy="0" r="38" fill="url(#glassGrad)" stroke="#c084fc" stroke-width="2" filter="url(#softGlow)"/>
-    <circle cx="0" cy="0" r="28" fill="#180b33" stroke="#a855f7" stroke-width="1.5"/>
-    <!-- Server Icon -->
-    <rect x="-12" y="-12" width="24" height="6" rx="1.5" fill="#e879f9"/>
-    <rect x="-12" y="-3" width="24" height="6" rx="1.5" fill="#c084fc"/>
-    <rect x="-12" y="6" width="24" height="6" rx="1.5" fill="#a855f7"/>
-    <circle cx="6" cy="-9" r="1" fill="#ffffff"/>
-    <circle cx="6" cy="0" r="1" fill="#ffffff"/>
-    <circle cx="6" cy="9" r="1" fill="#ffffff"/>
-
-    <!-- Satellite Device 1: Mobile Phone (Top-Left) -->
-    <g transform="translate(-80, -65)">
-      <rect x="-16" y="-24" width="32" height="48" rx="5" fill="#0f0c1b" stroke="#a855f7" stroke-width="1.5" filter="url(#softGlow)"/>
-      <rect x="-13" y="-19" width="26" height="36" rx="2" fill="#1e1035"/>
-      <circle cx="0" cy="20" r="1.5" fill="#c084fc"/>
-      <path d="M-6 -4 L0 2 L6 -4" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
-    </g>
-
-    <!-- Satellite Device 2: Laptop / Web Client (Top-Right) -->
-    <g transform="translate(85, -55)">
-      <rect x="-24" y="-16" width="48" height="30" rx="3" fill="#0f0c1b" stroke="#6366f1" stroke-width="1.5" filter="url(#softGlow)"/>
-      <rect x="-20" y="-13" width="40" height="22" rx="1.5" fill="#151030"/>
-      <path d="M-30 14 L30 14" stroke="#818cf8" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="0" cy="-2" r="3" fill="#a855f7"/>
-    </g>
-
-    <!-- Satellite Device 3: Tablet (Bottom-Left) -->
-    <g transform="translate(-75, 70)">
-      <rect x="-22" y="-17" width="44" height="34" rx="4" fill="#0f0c1b" stroke="#c084fc" stroke-width="1.5" filter="url(#softGlow)"/>
-      <rect x="-18" y="-13" width="36" height="26" rx="2" fill="#1b1233"/>
-      <circle cx="18" cy="0" r="1.2" fill="#a855f7"/>
-      <rect x="-10" y="-4" width="20" height="8" rx="1" fill="#6366f1" fill-opacity="0.6"/>
-    </g>
-
-    <!-- Satellite Device 4: Cloud / Microservice Node (Bottom-Right) -->
-    <g transform="translate(80, 65)">
-      <circle cx="0" cy="0" r="18" fill="#0f0c1b" stroke="#38bdf8" stroke-width="1.5" filter="url(#softGlow)"/>
-      <path d="M-8 2 C-8 -4, -2 -8, 2 -6 C5 -8, 10 -4, 9 1 C12 2, 12 7, 7 8 L-6 8 C-10 8, -11 4, -8 2 Z" fill="#38bdf8" fill-opacity="0.8"/>
-    </g>
-  </g>
-
-  <!-- Left Side: Brand Typography & Identity -->
-  <g transform="translate(80, 100)">
-    <!-- Badge: Version & Engine -->
-    <g transform="translate(0, 0)">
-      <rect x="0" y="0" width="225" height="28" rx="14" fill="#201335" stroke="#7e22ce" stroke-width="1"/>
-      <circle cx="14" cy="14" r="4" fill="#10b981" filter="url(#softGlow)"/>
-      <text x="26" y="18" fill="#e9d5ff" class="mono-text" font-weight="600">RUBY-BAILEYS v1.5.17</text>
-      <rect x="160" y="5" width="55" height="18" rx="9" fill="#7e22ce" fill-opacity="0.4"/>
-      <text x="171" y="17" fill="#f0abfc" class="mono-text" font-size="9" font-weight="700">ESM</text>
-    </g>
-
-    <!-- Main Title: RUBBY -->
-    <text x="0" y="80" fill="url(#silverGrad)" class="title-text" font-size="46" filter="url(#softGlow)">RUBBY</text>
-    <text x="210" y="80" fill="url(#coreGlow)" class="title-text" font-size="46" filter="url(#softGlow)">MD</text>
-
-    <!-- Secondary Title / Descriptor -->
-    <text x="2" y="112" fill="#c084fc" class="sub-text" font-size="14" font-weight="700">MODULAR WHATSAPP AUTOMATION CORE</text>
-
-    <!-- Tagline -->
-    <text x="2" y="146" fill="#94a3b8" class="sub-text" font-size="14" font-weight="400">
-      A lightweight WhatsApp multi-device automation experience.
-    </text>
-
-    <!-- Developer & Platform Details -->
-    <g transform="translate(2, 185)">
-      <!-- Dev Tag -->
-      <g transform="translate(0, 0)">
-        <rect x="0" y="0" width="125" height="32" rx="8" fill="#150d26" stroke="#4c1d95" stroke-width="1"/>
-        <text x="12" y="20" fill="#a78bfa" class="mono-text" font-weight="500">Dev : </text>
-        <text x="50" y="20" fill="#ffffff" class="mono-text" font-weight="700">Kyuu</text>
-      </g>
-
-      <!-- Architecture Tag -->
-      <g transform="translate(135, 0)">
-        <rect x="0" y="0" width="165" height="32" rx="8" fill="#150d26" stroke="#4c1d95" stroke-width="1"/>
-        <text x="12" y="20" fill="#a78bfa" class="mono-text" font-weight="500">Core : </text>
-        <text x="58" y="20" fill="#38bdf8" class="mono-text" font-weight="700">Node.js ESM</text>
-      </g>
-
-      <!-- Features Count Tag -->
-      <g transform="translate(310, 0)">
-        <rect x="0" y="0" width="150" height="32" rx="8" fill="#150d26" stroke="#4c1d95" stroke-width="1"/>
-        <text x="12" y="20" fill="#a78bfa" class="mono-text" font-weight="500">Plugins : </text>
-        <text x="75" y="20" fill="#4ade80" class="mono-text" font-weight="700">250+ Live</text>
-      </g>
-    </g>
-  </g>
-</svg>
+# 🌸 RUBBY MULTI DEVICE 🌸
+### *A lightweight, modular, and high-performance WhatsApp Multi-Device automation bot.*
+**By Kyuu • Powered by `ruby-baileys@1.5.17` • Node.js ESM**
 
 <br/>
 
-<!-- ACTION NAVIGATION BUTTONS -->
-<p align="center">
-  <a href="https://github.com/KyuuX444">
-    <img src="https://img.shields.io/badge/GitHub-KyuuX444-18181b?style=for-the-badge&logo=github&logoColor=white&borderColor=a855f7" alt="GitHub"/>
-  </a>
-  &nbsp;
-  <a href="https://api.kyzzz.xyz">
-    <img src="https://img.shields.io/badge/Rest_API-api.kyzzz.xyz-7e22ce?style=for-the-badge&logo=fastapi&logoColor=white" alt="Rest API"/>
-  </a>
-  &nbsp;
-  <a href="https://whatsapp.com/channel/0029VbDXYlKDJ6H1D7Dm0f13">
-    <img src="https://img.shields.io/badge/WhatsApp-Official_Channel-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Channel"/>
-  </a>
-  &nbsp;
-  <a href="https://youtube.com/@MommyKyuu">
-    <img src="https://img.shields.io/badge/YouTube-MommyKyuu-dc2626?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube"/>
-  </a>
-</p>
+[![GitHub Repository](https://img.shields.io/badge/GitHub-KyuuX444%2FRubby--MD-18181b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/KyuuX444/Rubby-MD)
+[![Official Website](https://img.shields.io/badge/Rest_API-api.kyzzz.xyz-7e22ce?style=for-the-badge&logo=fastapi&logoColor=white)](https://api.kyzzz.xyz)
+[![WhatsApp Channel](https://img.shields.io/badge/WhatsApp-Official_Channel-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://whatsapp.com/channel/0029VbDXYlKDJ6H1D7Dm0f13)
+[![YouTube Channel](https://img.shields.io/badge/YouTube-MommyKyuu-dc2626?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/@MommyKyuu)
+
+[![License](https://img.shields.io/badge/License-ISC-blue?style=flat-square)](LICENSE)
+[![Node.js Version](https://img.shields.io/badge/Node.js-%3E%3D18.0.0-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
+[![Engine](https://img.shields.io/badge/Engine-ruby--baileys-a855f7?style=flat-square)](https://github.com/KyuuX444)
+[![Plugins](https://img.shields.io/badge/Plugins-250%2B%20Live-10b981?style=flat-square)](plugins/)
 
 </div>
 
@@ -264,103 +79,13 @@ Dirancang dari fondasi modular dengan fokus pada:
 
 ## 4. Architecture & Workflow
 
-<!-- ARCHITECTURE FLOWCHART SVG -->
-<div align="center">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 300" width="100%" height="auto" style="max-width: 920px; display: block; margin: auto;">
-  <defs>
-    <linearGradient id="flowBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#090812"/>
-      <stop offset="100%" stop-color="#040307"/>
-    </linearGradient>
-
-    <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#241242"/>
-      <stop offset="100%" stop-color="#120924"/>
-    </linearGradient>
-
-    <linearGradient id="arrowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#a855f7"/>
-      <stop offset="100%" stop-color="#38bdf8"/>
-    </linearGradient>
-
-    <filter id="nodeGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="4" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-
-  <style>
-    .node-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 700; font-size: 13px; fill: #ffffff; }
-    .node-desc { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 10px; fill: #c084fc; }
-  </style>
-
-  <!-- Canvas -->
-  <rect width="920" height="300" rx="16" fill="url(#flowBg)" stroke="#4c1d95" stroke-width="1.2"/>
-
-  <!-- Flow Connector Lines -->
-  <path d="M 170 150 L 220 150" stroke="url(#arrowGrad)" stroke-width="2" stroke-dasharray="4,4"/>
-  <polygon points="220,150 212,145 212,155" fill="#38bdf8"/>
-
-  <path d="M 370 150 L 420 150" stroke="url(#arrowGrad)" stroke-width="2" stroke-dasharray="4,4"/>
-  <polygon points="420,150 412,145 412,155" fill="#38bdf8"/>
-
-  <path d="M 570 150 L 620 150" stroke="url(#arrowGrad)" stroke-width="2" stroke-dasharray="4,4"/>
-  <polygon points="620,150 612,145 612,155" fill="#38bdf8"/>
-
-  <path d="M 770 150 L 810 150" stroke="url(#arrowGrad)" stroke-width="2"/>
-  <polygon points="810,150 802,145 802,155" fill="#38bdf8"/>
-
-  <!-- Node 1: WhatsApp Ingress -->
-  <g transform="translate(30, 95)">
-    <rect width="140" height="110" rx="12" fill="url(#nodeGrad)" stroke="#a855f7" stroke-width="1.5" filter="url(#nodeGlow)"/>
-    <circle cx="70" cy="30" r="14" fill="#7e22ce" stroke="#e879f9" stroke-width="1"/>
-    <text x="70" y="34" text-anchor="middle" fill="#ffffff" font-size="12">📡</text>
-    <text x="70" y="65" text-anchor="middle" class="node-title">1. INGRESS</text>
-    <text x="70" y="82" text-anchor="middle" class="node-desc">ruby-baileys</text>
-    <text x="70" y="95" text-anchor="middle" class="node-desc">WebSocket WA</text>
-  </g>
-
-  <!-- Node 2: Serializer & LID -->
-  <g transform="translate(230, 95)">
-    <rect width="140" height="110" rx="12" fill="url(#nodeGrad)" stroke="#6366f1" stroke-width="1.5" filter="url(#nodeGlow)"/>
-    <circle cx="70" cy="30" r="14" fill="#4338ca" stroke="#818cf8" stroke-width="1"/>
-    <text x="70" y="34" text-anchor="middle" fill="#ffffff" font-size="12">⚙️</text>
-    <text x="70" y="65" text-anchor="middle" class="node-title">2. SERIALIZER</text>
-    <text x="70" y="82" text-anchor="middle" class="node-desc">LID Resolution</text>
-    <text x="70" y="95" text-anchor="middle" class="node-desc">Auth & Perm Guard</text>
-  </g>
-
-  <!-- Node 3: Plugin Dispatcher -->
-  <g transform="translate(430, 95)">
-    <rect width="140" height="110" rx="12" fill="url(#nodeGrad)" stroke="#c084fc" stroke-width="1.5" filter="url(#nodeGlow)"/>
-    <circle cx="70" cy="30" r="14" fill="#9333ea" stroke="#f0abfc" stroke-width="1"/>
-    <text x="70" y="34" text-anchor="middle" fill="#ffffff" font-size="12">🧩</text>
-    <text x="70" y="65" text-anchor="middle" class="node-title">3. REGISTRY</text>
-    <text x="70" y="82" text-anchor="middle" class="node-desc">Hot Reload Engine</text>
-    <text x="70" y="95" text-anchor="middle" class="node-desc">250+ ESM Plugins</text>
-  </g>
-
-  <!-- Node 4: Execution Hub -->
-  <g transform="translate(630, 95)">
-    <rect width="140" height="110" rx="12" fill="url(#nodeGrad)" stroke="#ec4899" stroke-width="1.5" filter="url(#nodeGlow)"/>
-    <circle cx="70" cy="30" r="14" fill="#be185d" stroke="#f472b6" stroke-width="1"/>
-    <text x="70" y="34" text-anchor="middle" fill="#ffffff" font-size="12">⚡</text>
-    <text x="70" y="65" text-anchor="middle" class="node-title">4. PIPELINE</text>
-    <text x="70" y="82" text-anchor="middle" class="node-desc">Kyzz API / Sharp</text>
-    <text x="70" y="95" text-anchor="middle" class="node-desc">FFmpeg Audio</text>
-  </g>
-
-  <!-- Node 5: Output Delivery -->
-  <g transform="translate(815, 115)">
-    <circle cx="35" cy="35" r="32" fill="#10b981" fill-opacity="0.2" stroke="#10b981" stroke-width="2" filter="url(#nodeGlow)"/>
-    <text x="35" y="33" text-anchor="middle" fill="#ffffff" font-size="14">💬</text>
-    <text x="35" y="48" text-anchor="middle" fill="#34d399" class="node-desc" font-weight="700">SEND</text>
-  </g>
-</svg>
-</div>
+```mermaid
+flowchart LR
+    A["📡 Ingress (ruby-baileys)"] --> B["⚙️ Serializer & LID Guard"]
+    B --> C["🧩 Plugin Registry & Dispatcher"]
+    C --> D["⚡ Pipeline & Kyzz API / Media"]
+    D --> E["💬 WhatsApp Outgoing Delivery"]
+```
 
 ---
 
