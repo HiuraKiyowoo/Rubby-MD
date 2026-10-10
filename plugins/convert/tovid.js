@@ -57,13 +57,15 @@ async function convertWebpToMp4(webpBuffer) {
 
   return new Promise((resolve, reject) => {
     const ff = spawn('ffmpeg', [
+      '-hide_banner',
+      '-loglevel', 'error',
       '-y',
       '-i', tmpIn,
       '-movflags', 'faststart',
       '-pix_fmt', 'yuv420p',
       '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2',
       tmpOut
-    ])
+    ], { stdio: ['ignore', 'ignore', 'ignore'] })
 
     ff.on('close', async () => {
       try {

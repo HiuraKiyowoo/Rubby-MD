@@ -82,7 +82,7 @@ const toAudioVN = async (buffer) => {
 	try {
 		fs.writeFileSync(mediaPath, buffer);
 		await new Promise((resolve, reject) => {
-			exec(`ffmpeg -y -i "${mediaPath}" -vn -c:a libopus -b:a 64k -ac 1 -ar 48000 "${outPath}"`, (err) => {
+			exec(`ffmpeg -hide_banner -loglevel error -y -i "${mediaPath}" -vn -c:a libopus -b:a 64k -ac 1 -ar 48000 "${outPath}"`, (err) => {
 				if (err) return reject(err);
 				resolve();
 			});

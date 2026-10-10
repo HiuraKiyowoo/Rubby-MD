@@ -80,6 +80,7 @@ async function toVN(buffer) {
       .noVideo()
       .audioCodec('libopus')
       .format('ogg')
+      .outputOptions(['-hide_banner', '-loglevel error'])
       .on('error', reject)
       .on('end', () => resolve(Buffer.concat(chunks)))
       .pipe(output)

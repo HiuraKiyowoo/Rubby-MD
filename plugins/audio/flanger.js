@@ -84,7 +84,7 @@ const handler = async (m, { conn, sock, usedPrefix, command, reply }) => {
     }
 
     const ffmpegFilter = "-af \"asetrate=48000*1.5,atempo=1.5,asetrate=48000,equalizer=f=8000:width_type=h:width=50:g=6,apulsator=hz=0.125:amount=1\""
-    exec(`ffmpeg -y -i "${inputPath}" ${ffmpegFilter} "${outputPath}"`, async (err) => {
+    exec(`ffmpeg -hide_banner -loglevel error -y -i "${inputPath}" ${ffmpegFilter} "${outputPath}"`, async (err) => {
       try {
         try { unlinkSync(inputPath) } catch {}
         if (err) return (reply || m.reply)("❌ Gagal memproses efek audio!")

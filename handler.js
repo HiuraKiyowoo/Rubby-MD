@@ -54,12 +54,64 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const disabledDbFile = path.resolve(__dirname, 'database/disabled_plugins.json')
 
 const groupCache = new Map()
+const groupMetadataCache = new Map()
+
+export async function getGroupMetadata(sock, jid, force = false) {
+  if (!jid || !jid.endsWith('@g.us')) return null
+  const cached = groupMetadataCache.get(jid)
+  if (!force && cached && Date.now() - cached.time < 15000) {
+    return cached.data
+  }
+  try {
+    const meta = await sock.groupMetadata(jid)
+    if (meta) {
+      groupMetadataCache.set(jid, { data: meta, time: Date.now() })
+      if (meta.subject) {
+        groupCache.set(jid, { subject: meta.subject, time: Date.now() })
+      }
+      return meta
+    }
+  } catch (err) {
+    if (cached?.data) return cached.data
+    throw err
+  }
+  return cached?.data || null
+}
+
+export function isParticipantAdmin(p) {
+  return Boolean(p && (p.admin === 'admin' || p.admin === 'superadmin'))
+}
+
+export function getParticipantIdentifiers(p) {
+  if (!p) return []
+  const ids = [
+    p.id,
+    p.lid,
+    p.jid,
+    p.phoneNumber
+  ].filter(Boolean)
+  const numbers = ids.map(id => normalizeNumber(id)).filter(Boolean)
+  return [...new Set([...ids, ...numbers])]
+}
+
+export function matchParticipant(p, targets) {
+  if (!p || !targets || !targets.length) return false
+  const pKeys = getParticipantIdentifiers(p)
+  for (const t of targets) {
+    if (!t) continue
+    if (pKeys.includes(t)) return true
+    const normT = normalizeNumber(t)
+    if (normT && pKeys.includes(normT)) return true
+  }
+  return false
+}
+
 async function getGroupName(sock, jid) {
   if (!jid || !jid.endsWith('@g.us')) return ''
   const cached = groupCache.get(jid)
-  if (cached && (Date.now() - cached.time < 300000)) return cached.subject
+  if (cached && Date.now() - cached.time < 300000) return cached.subject
   try {
-    const meta = await sock.groupMetadata(jid)
+    const meta = await getGroupMetadata(sock, jid)
     if (meta?.subject) {
       groupCache.set(jid, { subject: meta.subject, time: Date.now() })
       return meta.subject
@@ -311,16 +363,62 @@ export async function messageHandler(sock, chatUpdate, registry) {
       continue
     }
 
-    if (m.isGroup && (plugin.admin || plugin.botadmin)) {
+    let groupMetadata = null
+    let participants = []
+    let isUserAdmin = false
+    let isBotAdmin = false
+
+    if (m.isGroup) {
+      const userTargets = [
+        m.sender,
+        m.key?.participant,
+        m.key?.participantAlt,
+        m.raw?.participantAlt,
+        m.raw?.key?.participantAlt,
+        senderJid,
+        senderNumber
+      ].filter(Boolean)
+
+      const botTargets = [
+        sock.user?.id,
+        sock.user?.lid,
+        sock.user?.jid,
+        sock.authState?.creds?.me?.id,
+        sock.authState?.creds?.me?.lid,
+        botJid,
+        botNumber,
+        global.noBot,
+        normalizeNumber(global.noBot)
+      ].filter(Boolean)
+
       try {
-        const groupMetadata = await sock.groupMetadata(m.chat)
-        const participants = groupMetadata?.participants || []
+        groupMetadata = await getGroupMetadata(sock, m.chat)
+        participants = groupMetadata?.participants || []
 
-        const userAdmin = participants.find(p => normalizeNumber(p.id) === senderNumber)?.admin
-        const isUserAdmin = Boolean(userAdmin === 'admin' || userAdmin === 'superadmin' || m.isOwner)
+        const userParticipant = participants.find(p => matchParticipant(p, userTargets))
+        isUserAdmin = Boolean(m.isOwner || (userParticipant && isParticipantAdmin(userParticipant)))
 
-        const botAdmin = participants.find(p => normalizeNumber(p.id) === botNumber)?.admin
-        const isBotAdmin = Boolean(botAdmin === 'admin' || botAdmin === 'superadmin')
+        const botParticipant = participants.find(p => matchParticipant(p, botTargets))
+        isBotAdmin = Boolean(botParticipant && isParticipantAdmin(botParticipant))
+      } catch (err) {
+        logger.error('Failed to fetch group metadata:', err)
+      }
+
+      if (plugin.admin || plugin.botadmin) {
+        if (!groupMetadata || !participants.length) {
+          try {
+            groupMetadata = await getGroupMetadata(sock, m.chat, true)
+            participants = groupMetadata?.participants || []
+            const userParticipant = participants.find(p => matchParticipant(p, userTargets))
+            isUserAdmin = Boolean(m.isOwner || (userParticipant && isParticipantAdmin(userParticipant)))
+            const botParticipant = participants.find(p => matchParticipant(p, botTargets))
+            isBotAdmin = Boolean(botParticipant && isParticipantAdmin(botParticipant))
+          } catch (err) {
+            logger.error('Failed to force fetch group metadata for permission check', err)
+            await m.reply('Gagal memverifikasi status admin grup.')
+            continue
+          }
+        }
 
         if (plugin.admin && !isUserAdmin) {
           await m.reply('Perintah ini hanya dapat digunakan oleh *Admin Grup*.')
@@ -331,12 +429,13 @@ export async function messageHandler(sock, chatUpdate, registry) {
           await m.reply('Bot harus menjadi *Admin Grup* untuk menjalankan perintah ini.')
           continue
         }
-      } catch (err) {
-        logger.error('Failed to fetch group metadata for permission check', err)
-        await m.reply('Gagal memverifikasi status admin grup.')
-        continue
       }
     }
+
+    m.isAdmin = isUserAdmin
+    m.isBotAdmin = isBotAdmin
+    m.groupMetadata = groupMetadata
+    m.participants = participants
 
     if (plugin.noJadiBot && sock.isJadiBot) {
       await m.reply('Perintah ini tidak dapat dijalankan pada sesi JadiBot.')
@@ -353,6 +452,13 @@ export async function messageHandler(sock, chatUpdate, registry) {
         usedPrefix,
         prefix: usedPrefix,
         registry,
+        isOwner: m.isOwner,
+        isPremium: m.isPremium,
+        isAdmin: isUserAdmin,
+        isUserAdmin,
+        isBotAdmin,
+        groupMetadata,
+        participants,
         reply: (text, opt) => m.reply(text, opt)
       }
 

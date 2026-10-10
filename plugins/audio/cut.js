@@ -93,7 +93,7 @@ let handler = async (m, { conn, sock, args, usedPrefix, command, reply }) => {
             return (reply || m.reply)('❌ Gagal mengunduh audio.')
         }
 
-        exec(`ffmpeg -y -ss ${args[0]} -i "${inputPath}" -t ${args[1]} -c copy "${outputPath}"`, async (err) => {
+        exec(`ffmpeg -hide_banner -loglevel error -y -ss ${args[0]} -i "${inputPath}" -t ${args[1]} -c copy "${outputPath}"`, async (err) => {
             try {
                 try { unlinkSync(inputPath) } catch {}
                 if (err) return (reply || m.reply)(`_*Error!*_`)

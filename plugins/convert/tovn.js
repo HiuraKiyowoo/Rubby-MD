@@ -57,6 +57,8 @@ async function convertAudioToVn(audioBuffer) {
 
   return new Promise((resolve, reject) => {
     const ff = spawn('ffmpeg', [
+      '-hide_banner',
+      '-loglevel', 'error',
       '-y',
       '-i', tmpIn,
       '-vn',
@@ -65,7 +67,7 @@ async function convertAudioToVn(audioBuffer) {
       '-vbr', 'on',
       '-compression_level', '10',
       tmpOut
-    ])
+    ], { stdio: ['ignore', 'ignore', 'ignore'] })
 
     ff.on('close', async () => {
       try {
