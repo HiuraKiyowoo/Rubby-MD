@@ -234,47 +234,16 @@ Dirancang dari fondasi modular dengan fokus pada:
 └──────────────────────────────┴──────────────────────────────────────────────┘
 ```
 
-### Fitur Rinci Berdasarkan Kategori:
+### Ikhtisar Kategori Perintah (Highlights):
 
-1. **Downloader Multi-Platform (`plugins/downloader/`)**:
-   - `.tiktok` / `.tt` : Unduh video tanpa watermark dan album foto slide otomatis.
-   - `.instagram` / `.ig` : Unduh reel, video, dan postingan carousel foto.
-   - `.facebook` / `.fb` : Unduh video Facebook kualitas HD & SD beserta audio mp3.
-   - `.ytmp4` / `.ytv` & `.play` / `.ytmp3` : Streaming & unduh video dan audio YouTube.
-   - `.capcut` : Ekstraksi video CapCut tanpa watermark resolusi tinggi.
-   - `.mediafire` / `.mf` : Direct file stream downloader untuk dokumen & arsip.
-   - `.krakenfiles`, `.mp4upload`, `.pixeldrain` : Direct cloud storage downloader.
-
-2. **Sci-Fi Cyberpunk Telemetry HUD (`plugins/main/ping.js`)**:
-   - Kartu visual SVG vector beresolusi 1040x610 yang dirender ke PNG murni via Sharp.
-   - Mengukur metrik CPU load, model processor, RAM usage, storage I/O, server uptime, dan latency response time.
-
-3. **Modular Audio Processing (`plugins/audio/`)**:
-   - 21 Efek Audio Terpisah (1 file per effect): `.bass`, `.blown`, `.deep`, `.earrape`, `.fast`, `.fat`, `.nightcore`, `.reverse`, `.robot`, `.slow`, `.smooth`, `.tupai`, `.8d` / `.audio8d`, `.echo`, `.distortion`, `.pitch`, `.reverb`, `.flanger`, `.apulsator`, `.tremolo`, `.chorus`.
-   - 3 Alat Utilitas Audio: `.cut` (pemotong rentang audio), `.ttsanime` (Text-to-Speech karakter anime), `.ttsdracin` (Text-to-Speech drama China).
-
-4. **Canvas & Brat Generator (`plugins/maker/`)**:
-   - **Brat Engine**: `.brat`, `.bratblack`, `.bratpink`, `.bratgreen`, `.bratv2` (multi-baris), `.bratvid` / `.bratv` (animasi video), `.bratvidblack`, `.bratvidpink`, `.bratvidgreen`, `.bratvidv2` (60fps per kata), `.bratgojo`, `.bratvermeil`.
-   - **Mockup & Banner**: `.fakecall`, `.fakedana`, `.fakegopay`, `.fakeovo`, `.fakektp` (16 parameter), `.fakeml`, `.fakeff`, `.fakeffduo`, `.fakeffgirl`, `.animequote`, `.igqc`, `.iqc`, `.quotenokia`, `.sertifikattolol`.
-
-5. **AI Image Transformation (`plugins/ai-image/`)**:
-   - 31 gaya AI terintegrasi Kyzz API: `.tobotak`, `.tochibi`, `.tofigura`, `.tofigurav2`, `.tofigurav3`, `.tofunk`, `.toghibli`, `.tohijab`, `.tohitam`, `.tojapanese`, `.tojepang`, `.tokacamata`, `.tokamboja`, `.tolego`, `.toliquor`, `.tomaid`, `.tomirror`, `.tomoai`, `.tomonyet`, `.topacar`, `.topeci`, `.topiramida`, `.toputih`, `.toreal`, `.toroblox`, `.toroh`, `.totato`, `.totua`, `.tounderground`, `.toviking`, `.tozombie`.
-
-6. **Asupan, NSFW & Cewe Random (`plugins/asupan/`, `plugins/nsfw/`, `plugins/cewerandom/`)**:
-   - 10 video asupan TikTok (`.andin`, `.bocil`, `.gheayubi`, `.kayes`, `.notnot`, `.panrika`, `.santuy`, `.tiktokgirl`, `.tobrut`, `.ukhty`).
-   - 31 kategori media anime NSFW (`.ahegao`, `.ass`, `.bdsm`, `.blowjob`, `.cum`, `.doujin`, `.hentai`, `.neko`, `.rule34`, `.xnxx`, `.yuri`, dsb).
-   - 15 foto cecan estetik (`.china`, `.hijaber`, `.indonesia`, `.jepang`, `.korea`, `.malaysia`, `.thailand`, `.vietnam`, dsb).
-
-7. **Sistem Manajemen Grup & Otomasi Canvas (`plugins/group/`)**:
-   - Generator Canvas Welcome & Goodbye dinamis via Kyzz API dengan cache pre-kompresi Sharp.
-   - Kustomisasi teks per grup (`.setwelcome`, `.setgoodbye`) mendukung placeholder `@user`, `@grup`, dan `@bio`.
-   - Administrasi grup lengkap: `.kick`, `.add`, `.promote`, `.demote`, `.hidetag`, `.tagall`, `.open`, `.close`, `.linkgc`, `.revokelink`, `.swgc`.
-
-8. **Owner Tools & Backup Engine (`plugins/owner/`)**:
-   - `.backup` : Mengompresi seluruh codebase (mengecualikan `node_modules`, `session`, `tmp`, `.git`) menjadi berkas ZIP dan mengirimkannya langsung ke chat pribadi owner.
-   - Evaluasi runtime tanpa prefix: `>` (async eval), `=>` (eval return), `$` (terminal exec).
-   - Dynamic plugin switcher: `.pluginon`, `.pluginoff`, `.toggleplugin`.
-   - Mode switcher: `.self` dan `.public`.
+- **📥 Downloader**: Multi-platform media saver (TikTok, Instagram, Facebook, YouTube, CapCut, MediaFire, Pixeldrain).
+- **🎨 Maker & Canvas**: Brat generator dinamis (teks/video/warna), sertifikat, fake payment (Dana, Gopay, Ovo), & mockup sosial media.
+- **🎵 Audio Transformer**: 21+ efek DSP audio terisolasi (bass, 8d, echo, nightcore, slow, robot) dan anime/dracin TTS.
+- **🤖 AI Image Studio**: 31 preset transformasi gambar bertenaga Kyzz API (ghibli, chibi, lego, anime, roblox).
+- **👥 Group Automation**: Sistem sambutan dinamis (welcome/goodbye canvas generator) dan administrasi grup lengkap.
+- **🔍 Search & Stalker**: Pencarian lirik, resep, pinterest, spotify, serta profile stalker (IG, TikTok, Roblox, Telegram).
+- **🛠️ Tools & Utility**: Exif sticker maker, media converter, inspect ID channel, view-once retriever (RVO/SVO), dan URL shortener.
+- **👑 Owner Control**: Manajemen bot realtime, switch mode (`public`/`self`), hot-toggle plugin, evaluasi kode, & auto backup ZIP.
 
 ---
 
