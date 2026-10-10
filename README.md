@@ -523,33 +523,77 @@ Rubby-Multi-Device/
 
 ## 10. Plugin Development Guide
 
-Setiap berkas plugin di dalam direktori `plugins/` diekspor sebagai ES Module murni. Contoh struktur template standar:
+Sistem plugin Rubby Multi Device berbasis **ES Modules (ESM)** murni dengan dukungan **Hot-Reload** otomatis tanpa perlu restart bot.
+
+### 1. Template Dasar Perintah Teks (`plugins/main/hello.js`)
 
 ```javascript
-// plugins/example/hello.js
-
-const handler = async (m, { conn, sock, args, text, usedPrefix, command, reply }) => {
-  const client = conn || sock
-  
-  await reply(`Halo @${m.sender.split('@')[0]}! Terima kasih telah menggunakan Rubby Multi Device.`, {
-    mentions: [m.sender]
+const handler = async (m, { conn, args, text, usedPrefix, command, reply }) => {
+  const target = m.mentionedJid?.[0] || m.sender
+  await reply(`🌸 Halo @${target.split('@')[0]}! Selamat datang di *${global.botName}*.`, {
+    mentions: [target]
   })
 }
 
-handler.help = ['hello']              // Teks yang tampil pada menu bantuan
+handler.help = ['hello']              // Teks yang muncul pada menu (.menu)
 handler.tags = ['main']               // Kategori menu
-handler.command = ['hello', 'hi']     // Trigger perintah (bisa string / array)
-
-// Flags Perizinan (Opsional):
-handler.owner = false                 // Hanya dapat diakses Owner
-handler.premium = false               // Hanya dapat diakses Pengguna Premium
-handler.group = false                 // Hanya dapat diakses di dalam Grup
-handler.private = false               // Hanya dapat diakses di Chat Pribadi
-handler.admin = false                 // Memerlukan pengirim berstatus Admin Grup
-handler.botadmin = false              // Memerlukan bot berstatus Admin Grup
-handler.limit = true                  // Memerlukan konsumsi limit
+handler.command = ['hello', 'hi']     // Trigger perintah (string, array, atau RegExp)
 
 export default handler
+```
+
+---
+
+### 2. Template Plugin API & Media (`plugins/downloader/example.js`)
+
+```javascript
+import axios from 'axios'
+
+const handler = async (m, { conn, text, usedPrefix, command, reply }) => {
+  if (!text) return reply(`⚠️ *Format Salah!*\n\nContoh:\n*${usedPrefix + command}* https://vt.tiktok.com/xxxx/`)
+
+  await reply(global.mess.wait)
+
+  try {
+    const apiUrl = global.API('kyzz', '/api/downloader/tiktok', { url: text }, 'apikey')
+    const { data } = await axios.get(apiUrl, { timeout: 30000 })
+
+    if (!data.status) return reply(`❌ ${data.message || 'Gagal mengunduh media.'}`)
+
+    await conn.sendMessage(m.chat, {
+      video: { url: data.result.video },
+      caption: `🎬 *Judul:* ${data.result.title}\n👤 *Author:* ${data.result.author}`
+    }, { quoted: m })
+  } catch (err) {
+    await reply(`❌ Terjadi kesalahan: ${err.message}`)
+  }
+}
+
+handler.help = ['tiktok <url>']
+handler.tags = ['downloader']
+handler.command = /^(tiktok|tt|ttdl)$/i
+handler.limit = true                  // Memerlukan limit
+
+export default handler
+```
+
+---
+
+### 3. Parameter Handler & Permission Flags Lengkap
+
+```javascript
+// Parameter yang tersedia di handler:
+// async (m, { conn, sock, args, text, usedPrefix, command, registry, reply }) => {}
+
+// Flag Perizinan (Opsional):
+handler.owner = false      // Hanya dapat digunakan oleh Owner
+handler.premium = false    // Hanya untuk Pengguna Premium
+handler.group = false      // Hanya bisa di dalam Group Chat
+handler.private = false    // Hanya bisa di Private Chat (PC)
+handler.admin = false      // Pengirim pesan wajib Admin Grup
+handler.botAdmin = false   // Bot wajib menjadi Admin Grup
+handler.limit = false      // Mengurangi limit pengguna
+handler.disabled = false   // Menonaktifkan plugin secara manual
 ```
 
 ---
