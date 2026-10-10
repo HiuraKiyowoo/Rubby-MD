@@ -1,0 +1,88 @@
+/**
+╭━━━〔 ୨ৎ RUBBY MULTI DEVICE ୨ৎ 〕━━━╮
+┇
+┇       ✦ 𝗪𝗘𝗟𝗖𝗢𝗠𝗘 𝗧𝗢 𝗥𝗨𝗕𝗕𝗬 ✦
+┇          ૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ა ♡
+┇
+┇      ░▒▓█ 𝗥 𝗨 𝗕 𝗕 𝗬 █▓▒░
+┇          MULTI DEVICE SYSTEM
+┇
+┇  ──────── ୨୧ ────────
+┇        ♡ 𝗗𝗘𝗩𝗘𝗟𝗢𝗣𝗘𝗥 𝗜𝗡𝗙𝗢 ♡
+┇  ──────── ୨୧ ────────
+┇   ↳ Creator  : Kyuu
+┇   ↳ GitHub   : github.com/KyuuX444
+┇   ↳ YouTube  : MommyKyuu
+┇   ↳ Website  : https://api.kyzzz.xyz
+┇
+┇  ════════ ◇ ════════
+┇        📡 𝗢𝗙𝗙𝗜𝗖𝗜𝗔𝗟 𝗖𝗛𝗔𝗡𝗡𝗘𝗟
+┇  ════════ ◇ ════════
+┇   ↳ Updates & Announcements
+┇   ↳ https://whatsapp.com/channel/0029VbDXYlKDJ6H1D7Dm0f13
+┇
+┇  ┌─────── ⟡ ───────┐
+┇          ⚙️ 𝗦𝗬𝗦𝗧𝗘𝗠 𝗜𝗡𝗙𝗢
+┇  └─────── ⟡ ───────┘
+┇   • Runtime  : Node.js
+┇   • Engine   : Ruby-Baileys
+┇   • Platform : Linux
+┇   • Mode     : WhatsApp Multi Device
+┇
+┇  ──────── ♡ ────────
+┇          🌷 𝗙𝗘𝗔𝗧𝗨𝗥𝗘𝗦
+┇  ──────── ♡ ────────
+┇   › Modular ESM Plugins
+┇   › Pairing Code Authentication
+┇   › Automatic Plugin Loader
+┇   › Lightweight & Fast
+┇
+┇       ୨ৎ made with love by Kyuu ୨ৎ
+┇          ♡ RUBBY • 2026 ♡
+┇
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+*/
+
+import axios from 'axios';
+
+const handler = async (m, { sock, conn, reply }) => {
+	const client = sock || conn;
+
+	try {
+		await global.react?.(client, m, '🕒').catch(() => {});
+
+		const apiUrl = global.API('kyzz', '/api/islamic/bacaan-sholat', {}, 'apikey');
+		const { data } = await axios.get(apiUrl, { timeout: 15000 });
+
+		if (!data?.status || !Array.isArray(data?.result)) {
+			await global.react?.(client, m, '❌').catch(() => {});
+			return reply('❌ Gagal mengambil data Bacaan Sholat.');
+		}
+
+		let txt = `🕌 *BACAAN SHOLAT LENGKAP*\n\n`;
+		data.result.forEach((item, i) => {
+			txt += `*${i + 1}. ${item.nama}*\n`;
+			if (item.arabic) txt += `📖 ${item.arabic}\n`;
+			if (item.latin) txt += `🔤 _${item.latin}_\n`;
+			if (item.terjemahan) txt += `🇮🇩 ${item.terjemahan}\n`;
+			txt += `\n───────────────────\n\n`;
+		});
+
+		await reply(txt.trim());
+		await global.react?.(client, m, '✅').catch(() => {});
+
+	} catch (err) {
+		console.error('[BACAAN SHOLAT ERROR]', err);
+		await global.react?.(client, m, '❌').catch(() => {});
+		return reply('❌ Terjadi kesalahan saat mengambil Bacaan Sholat!');
+	}
+};
+
+handler.help = ['bacaansholat'];
+handler.tags = ['islamic'];
+handler.command = ['bacaansholat', 'bacaansolat'];
+handler.limit = true;
+
+handler.register = true;
+
+export default handler;

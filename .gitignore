@@ -1,0 +1,14 @@
+# Rubby Multi Device Ignore List
+node_modules/
+session/*
+!session/.gitkeep
+database/*
+!database/.gitkeep
+tmp/*
+!tmp/.gitkeep
+.env
+*.log
+.main_clean_backup.js
+*.backup.js
+
+
