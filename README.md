@@ -608,22 +608,10 @@ export default handler
 
 ## 13. About the Developer
 
-<table style="border-collapse: collapse; border: none;">
-  <tr>
-    <td width="90" align="center" valign="middle">
-      <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="72" height="72" rx="36" fill="#1e1035" stroke="#a855f7" stroke-width="2"/>
-        <circle cx="36" cy="28" r="14" fill="#7e22ce" stroke="#c084fc" stroke-width="1.5"/>
-        <path d="M16 58 C16 46, 25 42, 36 42 C47 42, 56 46, 56 58" fill="#4c1d95" stroke="#a855f7" stroke-width="1.5"/>
-      </svg>
-    </td>
-    <td>
-      <h3 style="margin: 0; color: #ffffff;">Kyuu</h3>
-      <p style="margin: 4px 0 0 0; color: #c084fc; font-size: 13px;">Creator & Lead Developer of Rubby Multi Device</p>
-      <p style="margin: 6px 0 0 0; color: #94a3b8; font-size: 12px;">Fokus pada pengembangan otomasi WhatsApp modern, arsitektur microservices, dan ekosistem API modular.</p>
-    </td>
-  </tr>
-</table>
+<p align="left">
+  <strong>Kyuu</strong> — <em>Creator & Lead Developer of Rubby Multi Device</em><br/>
+  Fokus pada pengembangan otomasi WhatsApp modern, arsitektur microservices, dan ekosistem API modular.
+</p>
 
 ### Official Developer Channels:
 - **GitHub**: [github.com/KyuuX444](https://github.com/KyuuX444)
