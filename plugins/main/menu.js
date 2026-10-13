@@ -199,18 +199,16 @@ let handler = async (m, { conn, sock, text, args, usedPrefix, registry }) => {
 
   const categoryRows = [
     {
-      header: '🌐 ALL COMMANDS',
-      title: toSmallFont('Semua Menu'),
-      description: toSmallFont('Tampilkan seluruh perintah bot'),
+      title: toSmallFont('semua menu'),
+      description: toSmallFont('tampilkan semua perintah bot'),
       id: `${prfx}menu all`
     }
   ]
 
   for (const cat of Object.keys(categories).sort()) {
     categoryRows.push({
-      header: `${getEmoji(cat)} ${cat.toUpperCase()}`,
-      title: toSmallFont(`Menu ${cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase()}`),
-      description: toSmallFont(`Lihat daftar perintah kategori ${cat}`),
+      title: toSmallFont(`menu ${cat.toLowerCase()}`),
+      description: toSmallFont(`daftar perintah ${cat.toLowerCase()}`),
       id: `${prfx}menu ${cat.toLowerCase()}`
     })
   }
@@ -229,16 +227,16 @@ let handler = async (m, { conn, sock, text, args, usedPrefix, registry }) => {
   }
 
   btn.addRawButton({
-    buttonText: { displayText: 'メニュー' },
+    buttonText: { displayText: toSmallFont('pilih menu') },
     buttonId: 'menu',
     type: 1,
     nativeFlowInfo: {
       name: 'single_select',
       paramsJson: JSON.stringify({
-        title: 'メニュー',
+        title: toSmallFont('daftar menu'),
         sections: [
           {
-            title: toSmallFont('Daftar Kategori Perintah'),
+            title: toSmallFont('kategori menu'),
             highlight_label: '',
             rows: categoryRows
           }

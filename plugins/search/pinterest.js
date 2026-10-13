@@ -46,7 +46,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import axios from 'axios'
-import { prepareWAMessageMedia } from 'ruby-baileys'
+import { Button, Carousel } from 'ruby-baileys'
 
 const handler = async (m, { conn, sock, text, reply, usedPrefix, command }) => {
 	const client = conn || sock || global.mainSock || global.conn
@@ -73,29 +73,8 @@ const handler = async (m, { conn, sock, text, reply, usedPrefix, command }) => {
 
 		const targetList = validItems.slice(0, 7)
 
-		let thumbBuffer = null
-		try {
-			if (fs.existsSync('media/thumb.jpg')) {
-				thumbBuffer = fs.readFileSync('media/thumb.jpg')
-			}
-		} catch {}
-
 		const cardPromises = targetList.map(async (item, index) => {
 			try {
-				let imageSource = null
-				if (item.image && typeof item.image === 'string' && item.image.startsWith('http')) {
-					imageSource = { url: item.image }
-				} else if (thumbBuffer) {
-					imageSource = thumbBuffer
-				}
-
-				if (!imageSource) return null
-
-				const media = await prepareWAMessageMedia(
-					{ image: imageSource },
-					{ upload: client.waUploadToServer }
-				)
-
 				const cardTitle = item.title && item.title.trim() ? item.title.trim() : text
 				const pinnerName = item.pinner || item.username || 'Pinterest User'
 				const pinLink = item.link || `https://pinterest.com/search/pins/?q=${encodeURIComponent(text)}`
@@ -105,25 +84,15 @@ const handler = async (m, { conn, sock, text, reply, usedPrefix, command }) => {
 					`👤 *Pinner:* ${pinnerName}` +
 					(item.likes ? `\n❤️ *Likes:* ${item.likes.toLocaleString('id-ID')}` : '')
 
-				return {
-					body: { text: captionBody },
-					footer: { text: `© ${global.botName || 'Rubby Multi Device'} • Pinterest` },
-					header: {
-						title: `📌 Gambar ${index + 1}/${targetList.length}`,
-						hasMediaAttachment: true,
-						imageMessage: media.imageMessage
-					},
-					nativeFlowMessage: {
-						buttons: [{
-							name: 'cta_url',
-							buttonParamsJson: JSON.stringify({
-								display_text: '📌 Buka Pinterest',
-								url: pinLink
-							})
-						}]
-					}
-				}
-			} catch (e) {
+				const card = new Button(client)
+					.setImage(item.image)
+					.setTitle(`📌 Gambar ${index + 1}/${targetList.length}`)
+					.setBody(captionBody)
+					.setFooter(`© ${global.botName || 'Rubby Multi Device'} • Pinterest`)
+					.addUrl('📌 Buka Pinterest', pinLink)
+
+				return await card.toCard()
+			} catch {
 				return null
 			}
 		})
@@ -135,23 +104,12 @@ const handler = async (m, { conn, sock, text, reply, usedPrefix, command }) => {
 			return reply('❌ Gagal menyiapkan media carousel gambar.')
 		}
 
-		await client.relayMessage(
-			m.chat,
-			{
-				viewOnceMessage: {
-					message: {
-						interactiveMessage: {
-							body: { text: `📌 *PINTEREST CAROUSEL RESULT*\n\nDitemukan *${resolvedCards.length}* gambar presisi untuk *"${text}"*. Geser kesamping ⏩` },
-							footer: { text: `© ${global.botName || 'Rubby Multi Device'} • Pinterest` },
-							carouselMessage: {
-								cards: resolvedCards
-							}
-						}
-					}
-				}
-			},
-			{ quoted: m }
-		)
+		const carousel = new Carousel(client)
+			.setBody(`📌 *PINTEREST CAROUSEL RESULT*\n\nDitemukan *${resolvedCards.length}* gambar presisi untuk *"${text}"*. Geser kesamping ⏩`)
+			.setFooter(`© ${global.botName || 'Rubby Multi Device'} • Pinterest`)
+			.addCard(resolvedCards)
+
+		await carousel.send(m.chat, { quoted: m.raw })
 
 		await client.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 	} catch (e) {

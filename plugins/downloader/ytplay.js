@@ -43,8 +43,10 @@
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
 */
 
+import fs from 'node:fs';
 import axios from 'axios';
 import sharp from 'sharp';
+import { ButtonV2 } from 'ruby-baileys';
 
 function formatDuration(val) {
 	if (!val || val === '-' || val === 'N/A') return '-';
@@ -119,12 +121,9 @@ const handler = async (m, { conn, sock, text, usedPrefix, command, reply }) => {
 		}
 
 		const dlApi = global.API('kyzz', '/api/download/ytmp3', { url: targetUrl }, 'apikey');
-		const [dlRes, thumbBuffer] = await Promise.all([
-			axios.get(dlApi, { timeout: 35000 }),
-			thumbnail ? getThumbJpegBuffer(thumbnail) : Promise.resolve(null)
-		]);
-
+		const dlRes = await axios.get(dlApi, { timeout: 35000 });
 		const dlData = dlRes.data;
+
 		if (!dlData?.status || !dlData?.result?.downloadUrl) {
 			await sendReact('✖️');
 			return reply(`Gagal mengunduh audio untuk lagu *${title || targetQuery}*.`);
@@ -135,32 +134,39 @@ const handler = async (m, { conn, sock, text, usedPrefix, command, reply }) => {
 		const trackChannel = channel || 'YouTube';
 		const rawDuration = duration || dlData.result.duration || 'N/A';
 		const trackDuration = formatDuration(rawDuration);
+		const finalThumbUrl = thumbnail || dlData.result.thumbnail || '';
 
-		const captionText = `🎵 *${trackTitle}*\n\n» Channel : ${trackChannel}\n» Durasi : ${trackDuration}\n» Views : ${views}\n» Link : ${targetUrl}`;
+		let thumbBuffer = await getThumbJpegBuffer(finalThumbUrl);
+		if (!thumbBuffer) {
+			try {
+				const fallbackThumbPath = './media/thumb.jpg';
+				if (fs.existsSync(fallbackThumbPath)) {
+					thumbBuffer = await sharp(fallbackThumbPath)
+						.resize(300, 300, { fit: 'cover' })
+						.toFormat('jpeg', { quality: 80 })
+						.toBuffer();
+				}
+			} catch {}
+		}
 
-		if (client && typeof client.sendButtons === 'function') {
-			await client.sendButtons(m.chat, {
-				location: {
-					degreesLatitude: 0,
-					degreesLongitude: 0,
-					name: trackTitle,
-					address: `Channel: ${trackChannel} • Durasi: ${trackDuration}`,
-					jpegThumbnail: thumbBuffer
-				},
-				text: '',
-				footer: captionText
-			}, { quoted: m });
-		} else {
+		const captionText = `🎵 *${trackTitle}*\n\n` +
+			`» Channel : ${trackChannel}\n` +
+			`» Durasi : ${trackDuration}\n` +
+			`» Views : ${views}\n` +
+			`» Link : ${targetUrl}`;
+
+		if (thumbBuffer) {
 			await client.sendMessage(m.chat, {
 				location: {
 					degreesLatitude: 0,
 					degreesLongitude: 0,
 					name: trackTitle,
-					address: `Channel: ${trackChannel} • Durasi: ${trackDuration}`,
+					address: `Channel: ${trackChannel} • Durasi: ${trackDuration}\nViews: ${views}\n${targetUrl}`,
 					jpegThumbnail: thumbBuffer
-				},
-				caption: captionText
-			}, { quoted: m });
+				}
+			}, { quoted: m.raw || m });
+		} else {
+			await reply(captionText);
 		}
 
 		await client.sendMessage(m.chat, {
@@ -178,9 +184,9 @@ const handler = async (m, { conn, sock, text, usedPrefix, command, reply }) => {
 	}
 };
 
-handler.help = ['play <judul>'];
+handler.help = ['play <judul>', 'yta <judul>'];
 handler.tags = ['downloader'];
-handler.command = ['play', 'ytmp3', 'ytplay']
+handler.command = ['play', 'ytmp3', 'ytplay', 'yta'];
 handler.limit = true;
 handler.register = true;
 

@@ -43,37 +43,20 @@
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
 */
 
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const dbFile = path.resolve(__dirname, '../../database/disabled_plugins.json')
+import { databaseApi } from '../../lib/database.js'
 
 function getDisabledDb() {
-  try {
-    if (!fs.existsSync(dbFile)) {
-      fs.mkdirSync(path.dirname(dbFile), { recursive: true })
-      fs.writeFileSync(dbFile, JSON.stringify([], null, 2))
-      return []
-    }
-    const data = JSON.parse(fs.readFileSync(dbFile, 'utf-8'))
-    return Array.isArray(data) ? data : []
-  } catch {
-    return []
+  if (global.db?.getDisabledPlugins) {
+    return global.db.getDisabledPlugins()
   }
+  return databaseApi.getDisabledPlugins()
 }
 
 function saveDisabledDb(data) {
-  try {
-    if (!fs.existsSync(path.dirname(dbFile))) {
-      fs.mkdirSync(path.dirname(dbFile), { recursive: true })
-    }
-    fs.writeFileSync(dbFile, JSON.stringify(data, null, 2))
-    return true
-  } catch {
-    return false
+  if (global.db?.setDisabledPlugins) {
+    return global.db.setDisabledPlugins(data)
   }
+  return databaseApi.setDisabledPlugins(data)
 }
 
 let handler = async (m, { text, args, usedPrefix, command, registry }) => {

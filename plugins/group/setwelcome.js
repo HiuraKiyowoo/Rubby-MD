@@ -43,37 +43,7 @@
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
 */
 
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const dbFile = path.resolve(__dirname, '../../database/groups.json')
-
-function getGroupDb() {
-  try {
-    if (!fs.existsSync(dbFile)) {
-      fs.mkdirSync(path.dirname(dbFile), { recursive: true })
-      fs.writeFileSync(dbFile, JSON.stringify({}, null, 2))
-      return {}
-    }
-    return JSON.parse(fs.readFileSync(dbFile, 'utf-8')) || {}
-  } catch {
-    return {}
-  }
-}
-
-function saveGroupDb(data) {
-  try {
-    if (!fs.existsSync(path.dirname(dbFile))) {
-      fs.mkdirSync(path.dirname(dbFile), { recursive: true })
-    }
-    fs.writeFileSync(dbFile, JSON.stringify(data, null, 2))
-    return true
-  } catch {
-    return false
-  }
-}
+import { databaseApi } from '../../lib/database.js'
 
 let handler = async (m, { text, usedPrefix, command }) => {
   if (!text) {
@@ -87,15 +57,11 @@ let handler = async (m, { text, usedPrefix, command }) => {
     )
   }
 
-  const db = getGroupDb()
-  if (!db[m.chat]) {
-    db[m.chat] = { welcome: false, goodbye: false }
-  }
+  const dbInst = global.db || databaseApi
+  dbInst.setGroup(m.chat, { welcomeText: text })
+  const group = dbInst.getGroup(m.chat)
 
-  db[m.chat].welcomeText = text
-  saveGroupDb(db)
-
-  return m.reply(`Berhasil mengubah teks welcome grup.\n\n*Status Welcome:* ${db[m.chat].welcome ? 'Aktif' : 'Nonaktif (ketik .on welcome untuk mengaktifkan)'}\n\n*Teks:*\n${text}`)
+  return m.reply(`Berhasil mengubah teks welcome grup.\n\n*Status Welcome:* ${group.welcome ? 'Aktif' : 'Nonaktif (ketik .on welcome untuk mengaktifkan)'}\n\n*Teks:*\n${text}`)
 }
 
 handler.command = ['setwelcome', 'setwel']

@@ -121,12 +121,9 @@ async function getGroupName(sock, jid) {
 }
 
 function getDisabledPlugins() {
-  try {
-    if (fs.existsSync(disabledDbFile)) {
-      const data = JSON.parse(fs.readFileSync(disabledDbFile, 'utf-8'))
-      return Array.isArray(data) ? data : []
-    }
-  } catch {}
+  if (global.db?.getDisabledPlugins) {
+    return global.db.getDisabledPlugins()
+  }
   return []
 }
 
@@ -195,9 +192,15 @@ function parseCommand(rawText, registry) {
 
 export async function messageHandler(sock, chatUpdate, registry) {
   if (!chatUpdate?.messages?.length) return
+  if (chatUpdate.type && chatUpdate.type !== 'notify') return
 
   for (const rawMessage of chatUpdate.messages) {
     if (!rawMessage?.message) continue
+
+    const msgTimestamp = rawMessage.messageTimestamp ? Number(rawMessage.messageTimestamp) * 1000 : 0
+    if (global.connectedTime && msgTimestamp && msgTimestamp < (global.connectedTime - 5000)) {
+      continue
+    }
 
     const remoteJid = rawMessage.key?.remoteJid || ''
     if (remoteJid.endsWith('@newsletter') || remoteJid === 'status@broadcast') continue
@@ -459,7 +462,8 @@ export async function messageHandler(sock, chatUpdate, registry) {
         isBotAdmin,
         groupMetadata,
         participants,
-        reply: (text, opt) => m.reply(text, opt)
+        reply: (text, opt) => m.reply(text, opt),
+        react: (emoji) => m.react(emoji)
       }
 
       await plugin.handler(m, pluginContext)

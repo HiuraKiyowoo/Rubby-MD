@@ -46,9 +46,9 @@
 global.botName = 'Rubby Multi Device'
 global.owner = ['6283150850721']
 global.mode = 'self'
-global.noBot = '6283150850721'
+global.noBot = '62895429174872'
 global.customPairingCode = 'RUBBYMD1'
-global.botVersion = '1.0.0'
+global.botVersion = '1.5.0'
 global.botCreator = 'Kyuu'
 global.packname = 'Rubby Multi Device'
 global.author = 'Kyuu'
@@ -65,7 +65,7 @@ global.APIs = {
 }
 
 global.APIKeys = {
-  'https://api.kyzzz.xyz': 'ambil_di_web' // Daftar dan dapatkan apikey gratis di https://api.kyzzz.xyz
+  'https://api.kyzzz.xyz': 'kyuuimp' // Daftar dan dapatkan apikey gratis di https://api.kyzzz.xyz
 }
 
 global.API = (name, path = '/', query = {}, apikeyqueryname) => {

@@ -43,37 +43,7 @@
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
 */
 
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const dbFile = path.resolve(__dirname, '../../database/groups.json')
-
-function getGroupDb() {
-  try {
-    if (!fs.existsSync(dbFile)) {
-      fs.mkdirSync(path.dirname(dbFile), { recursive: true })
-      fs.writeFileSync(dbFile, JSON.stringify({}, null, 2))
-      return {}
-    }
-    return JSON.parse(fs.readFileSync(dbFile, 'utf-8')) || {}
-  } catch {
-    return {}
-  }
-}
-
-function saveGroupDb(data) {
-  try {
-    if (!fs.existsSync(path.dirname(dbFile))) {
-      fs.mkdirSync(path.dirname(dbFile), { recursive: true })
-    }
-    fs.writeFileSync(dbFile, JSON.stringify(data, null, 2))
-    return true
-  } catch {
-    return false
-  }
-}
+import { databaseApi } from '../../lib/database.js'
 
 let handler = async (m, { text, args, usedPrefix, command }) => {
   const isEnable = command === 'on' || command === 'enable'
@@ -94,17 +64,14 @@ let handler = async (m, { text, args, usedPrefix, command }) => {
   }
 
   const targetKey = (feature === 'goodbye' || feature === 'bye') ? 'goodbye' : 'welcome'
-  const db = getGroupDb()
-  if (!db[m.chat]) {
-    db[m.chat] = { welcome: false, goodbye: false }
-  }
+  const dbInst = global.db || databaseApi
+  const group = dbInst.getGroup(m.chat)
 
-  if (db[m.chat][targetKey] === isEnable) {
+  if (group[targetKey] === isEnable) {
     return m.reply(`Fitur *${targetKey}* sudah *${isEnable ? 'AKTIF' : 'NONAKTIF'}* di grup ini sebelumnya.`)
   }
 
-  db[m.chat][targetKey] = isEnable
-  saveGroupDb(db)
+  dbInst.setGroup(m.chat, { [targetKey]: isEnable })
 
   return m.reply(`Fitur *${targetKey}* berhasil *${isEnable ? 'DIAKTIFKAN' : 'DINONAKTIFKAN'}* untuk grup ini.`)
 }
