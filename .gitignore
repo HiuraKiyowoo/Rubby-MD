@@ -10,5 +10,8 @@ tmp/*
 *.log
 .main_clean_backup.js
 *.backup.js
+main.backup.js
+backup.*.js
+backup.main.js
 
 
