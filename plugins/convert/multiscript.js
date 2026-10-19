@@ -633,7 +633,23 @@ Atau *reply pesan kode / file script* lalu ketik \`${usedPrefix + cmd}\``)
       const ast = parse(tokens, cfg.MEMBERS)
       const converted = emitCodeToLang(ast, toLang)
 
-      let msg = `✨ *CONVERT: ${fromLang.toUpperCase()} ➔ ${toLang.toUpperCase()}*\n\n`
+      const headerText = `✨ *CONVERT: ${fromLang.toUpperCase()} ➔ ${toLang.toUpperCase()}*`
+      const RichClass = typeof global.AIRich !== 'undefined' ? global.AIRich : (await import('ruby-baileys').then(r => r.AIRich).catch(() => null))
+
+      if (RichClass && client) {
+        try {
+          const rich = new RichClass(client)
+          rich.addText(headerText)
+          const codeLang = toLang === 'js' ? 'javascript' : toLang
+          rich.addCode(codeLang, converted.trim())
+          await rich.send(m.chat, { quoted: m })
+          return
+        } catch (errRich) {
+          console.error('[msconvert AIRich Error, fallback to normal reply]:', errRich)
+        }
+      }
+
+      let msg = `${headerText}\n\n`
       msg += `\`\`\`${toLang}\n${converted}\n\`\`\``
       return m.reply(msg)
     } catch (err) {

@@ -122,9 +122,9 @@ Review and adjust `setting.js` as needed:
 
 ```javascript
 global.botName = 'Rubby Multi Device'
-global.owner = ['6283150850721']        // Primary Owner Phone Number
+global.owner = ['628xxxxxxxxxx']        // Primary Owner Phone Number
 global.mode = 'public'                   // 'public' or 'self'
-global.noBot = '62895429174872'         // Bot Phone Number for Pairing Authentication
+global.noBot = '628xxxxxxxxxx'         // Bot Phone Number for Pairing Authentication
 global.customPairingCode = 'RUBBYMD1'    // Custom 8-Character Pairing Code
 ```
 
@@ -148,6 +148,19 @@ The repository features automated remote synchronization:
 
 1. **Terminal Console Alert**: Whenever a newer commit is detected on `main`, an interactive prompt asks whether to pull changes immediately (`y/n`).
 2. **In-Chat Owner Trigger**: Verified bot owners can execute the `.update` command directly from WhatsApp to pull remote changes and restart the daemon seamlessly.
+
+---
+
+## Changelog
+
+### v1.5.0 — System Stability & Feature Updates
+
+- **Sistem Registrasi & Profil Pengguna**: Registrasi terpusat, profil akun, dan bonus awal via konfigurasi.
+- **Sistem Limit & Ekonomi**: Transaksi atomik anti-minus, toko limit, transfer saldo berbiaya pajak, klaim harian, pekerjaan, dan riwayat mutasi.
+- **Sistem Text RPG**: Pilihan kelas karakter, simulasi pertarungan turn-based, perburuan monster, dungeon bertingkat, boss raid, inventori, penempaan (crafting), misi harian, dan pencapaian.
+- **Sistem Multi-Session JadiBot**: Penautan sesi klon via WhatsApp Pairing Code, auto-reconnect, dan isolasi sesi.
+- **Stabilitas & Keamanan**: Hot reload plugin dengan rollback otomatis, perbaikan resolver perintah ("did you mean"), database SQLite v2 (transaksi & backup mandiri), serta sanitasi keamanan data dan media.
+
 
 ---
 

@@ -47,7 +47,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { serialize } from './lib/serializer.js'
-import logger from './lib/logger.js'
+import logger, { maskSensitive } from './lib/logger.js'
 import { normalizeJid, normalizeNumber } from './lib/utils.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -55,6 +55,15 @@ const disabledDbFile = path.resolve(__dirname, 'database/disabled_plugins.json')
 
 const groupCache = new Map()
 const groupMetadataCache = new Map()
+const MAX_CACHE_SIZE = 500
+
+function pruneMap(map, maxSize = 500) {
+  if (map.size > maxSize) {
+    const keys = Array.from(map.keys())
+    const toDelete = keys.slice(0, Math.floor(maxSize / 2))
+    for (const k of toDelete) map.delete(k)
+  }
+}
 
 export async function getGroupMetadata(sock, jid, force = false) {
   if (!jid || !jid.endsWith('@g.us')) return null
@@ -65,6 +74,8 @@ export async function getGroupMetadata(sock, jid, force = false) {
   try {
     const meta = await sock.groupMetadata(jid)
     if (meta) {
+      pruneMap(groupMetadataCache, MAX_CACHE_SIZE)
+      pruneMap(groupCache, MAX_CACHE_SIZE)
       groupMetadataCache.set(jid, { data: meta, time: Date.now() })
       if (meta.subject) {
         groupCache.set(jid, { subject: meta.subject, time: Date.now() })
@@ -113,6 +124,7 @@ async function getGroupName(sock, jid) {
   try {
     const meta = await getGroupMetadata(sock, jid)
     if (meta?.subject) {
+      pruneMap(groupCache, MAX_CACHE_SIZE)
       groupCache.set(jid, { subject: meta.subject, time: Date.now() })
       return meta.subject
     }
@@ -128,13 +140,19 @@ function getDisabledPlugins() {
 }
 
 const prefixes = ['.', '#', '!', '/', '?', '%', '&', '$', '+', '~']
-const processedMessages = new Set()
-const MAX_PROCESSED_CACHE = 1000
+const processedMessages = new Map()
+const DEDUP_TTL_MS = 5 * 60 * 1000
 
 function cleanupDeduplicationCache() {
-  if (processedMessages.size > MAX_PROCESSED_CACHE) {
-    const arr = Array.from(processedMessages)
-    const toDelete = arr.slice(0, arr.length - 500)
+  const now = Date.now()
+  for (const [id, time] of processedMessages.entries()) {
+    if (now - time > DEDUP_TTL_MS) {
+      processedMessages.delete(id)
+    }
+  }
+  if (processedMessages.size > 2000) {
+    const arr = Array.from(processedMessages.keys())
+    const toDelete = arr.slice(0, arr.length - 1000)
     for (const id of toDelete) {
       processedMessages.delete(id)
     }
@@ -174,12 +192,13 @@ function parseCommand(rawText, registry) {
   if (registry) {
     const parts = trimmed.split(/\s+/)
     const command = (parts[0] || '').toLowerCase()
-    if (registry.getCommand(command)) {
+    const foundPlugin = registry.getCommand(command)
+    if (foundPlugin && foundPlugin.noPrefix !== false) {
       const args = parts.slice(1)
       const text = args.join(' ')
       return {
         isCommand: true,
-        usedPrefix: '.',
+        usedPrefix: '',
         command,
         args,
         text
@@ -198,7 +217,8 @@ export async function messageHandler(sock, chatUpdate, registry) {
     if (!rawMessage?.message) continue
 
     const msgTimestamp = rawMessage.messageTimestamp ? Number(rawMessage.messageTimestamp) * 1000 : 0
-    if (global.connectedTime && msgTimestamp && msgTimestamp < (global.connectedTime - 5000)) {
+    const connectTime = sock?.isJadiBot ? (sock.connectedTime || 0) : (global.connectedTime || 0)
+    if (connectTime && msgTimestamp && msgTimestamp < (connectTime - 5000)) {
       continue
     }
 
@@ -209,7 +229,7 @@ export async function messageHandler(sock, chatUpdate, registry) {
     if (!messageId) continue
 
     if (processedMessages.has(messageId)) continue
-    processedMessages.add(messageId)
+    processedMessages.set(messageId, Date.now())
     cleanupDeduplicationCache()
 
     const startTime = Date.now()
@@ -225,7 +245,14 @@ export async function messageHandler(sock, chatUpdate, registry) {
             const stop = await pluginData.handler.before(m, { sock, conn: sock, registry })
             if (stop) break
           } catch (err) {
-            logger.error('Error in plugin before hook:', err)
+            logger.error(`Error in plugin before hook (${pluginData.relativePath}):`, err)
+          }
+        }
+        if (typeof pluginData.handler?.all === 'function') {
+          try {
+            await pluginData.handler.all(m, { sock, conn: sock, registry })
+          } catch (err) {
+            logger.error(`Error in plugin all hook (${pluginData.relativePath}):`, err)
           }
         }
       }
@@ -316,6 +343,15 @@ export async function messageHandler(sock, chatUpdate, registry) {
     const plugin = registry.getCommand(command)
 
     if (!plugin) {
+      if (usedPrefix && command.length >= 2 && typeof registry?.findSimilar === 'function') {
+        const suggestion = registry.findSimilar(command, 0.68)
+        if (suggestion) {
+          try {
+            await m.reply(`Perintah *${usedPrefix}${command}* tidak ditemukan.\n\nMungkin maksud kamu:\n👉 *${usedPrefix}${suggestion}*`)
+          } catch {}
+        }
+      }
+
       const groupName = m.isGroup ? await getGroupName(sock, m.chat) : ''
       logger.chat({
         isGroup: m.isGroup,
@@ -330,7 +366,9 @@ export async function messageHandler(sock, chatUpdate, registry) {
       continue
     }
 
-    const isSelfMode = (global.mode || 'public').toLowerCase() === 'self'
+    const isSelfMode = sock?.isJadiBot
+      ? ((sock.mode || 'public').toLowerCase() === 'self')
+      : (global.mode || 'public').toLowerCase() === 'self'
     if (isSelfMode && !m.isOwner) continue
 
     const senderJid = m.sender
@@ -364,6 +402,34 @@ export async function messageHandler(sock, chatUpdate, registry) {
     if (plugin.private && m.isGroup) {
       await m.reply('Perintah ini hanya dapat digunakan di *Chat Pribadi*.')
       continue
+    }
+
+    const userDb = global.db?.getUser ? global.db.getUser(senderNumber) : null
+    m.user = userDb || null
+    m.limit = userDb?.limit_count ?? 25
+
+    if (plugin.register && !m.isOwner && (!userDb || userDb.registered !== 1)) {
+      await m.reply(`🌸 *AKUN BELUM TERDAFTAR*\n\nKamu harus mendaftar terlebih dahulu untuk menggunakan fitur ini.\nKetik *${usedPrefix}daftar <nama>* untuk mendaftar dan klaim bonus limit serta modal awal!`)
+      continue
+    }
+
+    let limitDeducted = 0
+    if (plugin.limit && !m.isOwner && !m.isPremium) {
+      const cost = typeof plugin.limit === 'number' ? Math.max(1, plugin.limit) : 1
+      if (global.db?.deductLimit) {
+        const deductResult = global.db.deductLimit(senderNumber, cost, `Command ${usedPrefix}${command}`)
+        if (!deductResult.success) {
+          await m.reply(`❌ Maaf, limit harian kamu sudah habis! (Dibutuhkan: ${cost}, Sisa: ${deductResult.currentLimit || 0})\n\nTunggu reset harian, beli limit dengan *${usedPrefix}buylimit*, atau klaim *${usedPrefix}daily*.`)
+          continue
+        }
+        limitDeducted = cost
+        m.limit = deductResult.limit
+      } else {
+        if (userDb && userDb.limit_count < cost) {
+          await m.reply('❌ Maaf, limit harian kamu sudah habis! Tunggu reset atau upgrade ke pengguna premium.')
+          continue
+        }
+      }
     }
 
     let groupMetadata = null
@@ -460,6 +526,8 @@ export async function messageHandler(sock, chatUpdate, registry) {
         isAdmin: isUserAdmin,
         isUserAdmin,
         isBotAdmin,
+        user: m.user,
+        limit: m.limit,
         groupMetadata,
         participants,
         reply: (text, opt) => m.reply(text, opt),
@@ -480,6 +548,11 @@ export async function messageHandler(sock, chatUpdate, registry) {
         status: 'success ✓'
       })
     } catch (err) {
+      if (limitDeducted > 0 && global.db?.addLimit) {
+        try {
+          global.db.addLimit(senderNumber, limitDeducted, `Refund limit gagal eksekusi ${usedPrefix}${command}`)
+        } catch {}
+      }
       const responseTime = Date.now() - startTime
       const groupName = m.isGroup ? await getGroupName(sock, m.chat) : ''
       logger.chat({
@@ -494,10 +567,12 @@ export async function messageHandler(sock, chatUpdate, registry) {
       })
       logger.error(`Plugin execution failed for command '${usedPrefix}${command}'`, err)
       try {
-        await m.reply(`Terjadi kesalahan saat mengeksekusi perintah *${usedPrefix}${command}*:\n\`\`\`${err?.message || err}\`\`\``)
+        const cleanErrMsg = maskSensitive(err?.message || err)
+        await m.reply(`Terjadi kesalahan saat mengeksekusi perintah *${usedPrefix}${command}*:\n\`\`\`${cleanErrMsg}\`\`\``)
       } catch {}
     }
   }
 }
 
 export default messageHandler
+

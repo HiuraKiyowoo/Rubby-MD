@@ -44,9 +44,9 @@
 */
 
 global.botName = 'Rubby Multi Device'
-global.owner = ['6283150850721']
-global.mode = 'self'
-global.noBot = '62xxx'
+global.owner = ['628xxxxxxxxxx'] // Ganti dengan nomor WhatsApp owner Anda (contoh: 6281234567890)
+global.mode = 'public' // 'public' atau 'self'
+global.noBot = '628xxxxxxxxxx' // Nomor WhatsApp bot untuk pairing code
 global.customPairingCode = 'RUBBYMD1'
 global.botVersion = '1.5.0'
 global.botCreator = 'Kyuu'
@@ -78,3 +78,47 @@ global.API = (name, path = '/', query = {}, apikeyqueryname) => {
   const search = new URLSearchParams(q).toString()
   return baseUrl + path + (search ? '?' + search : '')
 }
+
+global.settings = {
+  registration: {
+    enabled: true,
+    startingLimit: 25,
+    startingBalance: 10000,
+    startingExp: 100,
+    requireRegistrationForEconomy: true
+  },
+  limit: {
+    enabled: true,
+    dailyBonus: 15,
+    dailyResetTimezone: 'Asia/Jakarta',
+    maxFreeLimit: 100
+  },
+  economy: {
+    enabled: true,
+    currency: 'Rp',
+    transferTaxRate: 0.05, // 5% transfer fee
+    dailyCooldown: 86400000, // 24 hours
+    workCooldown: 300000, // 5 minutes
+    begCooldown: 120000 // 2 minutes
+  },
+  shop: {
+    enabled: true,
+    limitPackages: [
+      { id: '1', amount: 5, price: 5000, name: 'Paket Mini (+5 Limit)' },
+      { id: '2', amount: 15, price: 14000, name: 'Paket Sedang (+15 Limit)' },
+      { id: '3', amount: 35, price: 30000, name: 'Paket Jumbo (+35 Limit)' },
+      { id: '4', amount: 100, price: 80000, name: 'Paket Sultan (+100 Limit)' }
+    ]
+  },
+  rpg: {
+    enabled: true,
+    huntCooldown: 180000, // 3 minutes
+    adventureCooldown: 600000, // 10 minutes
+    dungeonCooldown: 1800000, // 30 minutes
+    bossCooldown: 3600000, // 1 hour
+    healCooldown: 60000, // 1 minute
+    healPotionCost: 1000,
+    staminaPotionCost: 1500
+  }
+}
+

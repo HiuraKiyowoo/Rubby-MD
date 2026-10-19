@@ -89,28 +89,42 @@ function formatUptime(seconds) {
 
 const categoryEmojis = {
   ai: '🤖',
+  'ai-image': '🪄',
+  asupan: '💃',
+  audio: '🎧',
+  cewerandom: '👧',
   convert: '🔄',
   downloader: '📥',
   download: '📥',
+  ephoto: '📸',
   example: '💡',
   fun: '🎲',
+  github: '🐙',
   group: '👥',
   grup: '👥',
   info: 'ℹ️',
-  main: '📌',
+  islamic: '🌙',
+  main: '🎀',
   maker: '🎨',
+  manga: '📚',
+  news: '📰',
+  novel: '📖',
+  nsfw: '🔞',
   other: '✨',
   owner: '👑',
   panel: '⚡',
   premium: '💎',
+  primbon: '🔮',
   rpg: '⚔️',
   search: '🔍',
   stalk: '🕵️',
+  stalker: '🕵️',
+  streaming: '🎬',
   tools: '🔧',
   webapi: '🌐'
 }
 
-const getEmoji = (cat) => categoryEmojis[cat.toLowerCase()] || '📌'
+const getEmoji = (cat) => categoryEmojis[cat.toLowerCase()] || '🌸'
 
 let cachedThumbBuffer = null
 async function getThumbBuffer() {
@@ -199,7 +213,7 @@ let handler = async (m, { conn, sock, text, args, usedPrefix, registry }) => {
 
   const categoryRows = [
     {
-      title: toSmallFont('semua menu'),
+      title: `📑 ${toSmallFont('semua menu')}`,
       description: toSmallFont('tampilkan semua perintah bot'),
       id: `${prfx}menu all`
     }
@@ -207,7 +221,7 @@ let handler = async (m, { conn, sock, text, args, usedPrefix, registry }) => {
 
   for (const cat of Object.keys(categories).sort()) {
     categoryRows.push({
-      title: toSmallFont(`menu ${cat.toLowerCase()}`),
+      title: `${getEmoji(cat)} ${toSmallFont(`menu ${cat.toLowerCase()}`)}`,
       description: toSmallFont(`daftar perintah ${cat.toLowerCase()}`),
       id: `${prfx}menu ${cat.toLowerCase()}`
     })

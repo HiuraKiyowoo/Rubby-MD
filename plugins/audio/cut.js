@@ -45,7 +45,9 @@
 
 import { unlinkSync, readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
-import { exec } from 'child_process'
+import { spawn } from 'child_process'
+
+const TIME_REGEX = /^(\d{1,2}:)?[0-5]?\d:[0-5]\d(\.\d+)?$|^\d+(\.\d+)?$/
 
 let handler = async (m, { conn, sock, args, usedPrefix, command, reply }) => {
     const client = conn || sock
@@ -60,14 +62,17 @@ let handler = async (m, { conn, sock, args, usedPrefix, command, reply }) => {
             return (reply || m.reply)(`Balas vn/audio yang ingin diubah dengan caption *${usedPrefix + command}*`)
         }
 
-        if (!args[0] || !args[1]) {
-            return (reply || m.reply)(`Contoh: ${usedPrefix + command} 00:00:30 00:00:30`)
+        if (!args[0] || !args[1] || !TIME_REGEX.test(args[0].trim()) || !TIME_REGEX.test(args[1].trim())) {
+            return (reply || m.reply)(`Format waktu tidak valid!\nContoh: *${usedPrefix + command} 00:00:10 00:00:30*`)
         }
+
+        const startPos = args[0].trim()
+        const duration = args[1].trim()
 
         let tmpDir = join(process.cwd(), 'tmp')
         if (!existsSync(tmpDir)) mkdirSync(tmpDir, { recursive: true })
 
-        let getRandom = (ext) => `${Math.floor(Math.random() * 10000)}${ext}`
+        let getRandom = (ext) => `${Date.now()}_${Math.floor(Math.random() * 10000)}${ext}`
         let inputPath = join(tmpDir, getRandom('.mp3'))
         let outputPath = join(tmpDir, getRandom('.mp3'))
 
@@ -93,22 +98,54 @@ let handler = async (m, { conn, sock, args, usedPrefix, command, reply }) => {
             return (reply || m.reply)('❌ Gagal mengunduh audio.')
         }
 
-        exec(`ffmpeg -hide_banner -loglevel error -y -ss ${args[0]} -i "${inputPath}" -t ${args[1]} -c copy "${outputPath}"`, async (err) => {
+        const cleanup = () => {
+            try { if (existsSync(inputPath)) unlinkSync(inputPath) } catch {}
+            try { if (existsSync(outputPath)) unlinkSync(outputPath) } catch {}
+        }
+
+        const ff = spawn('ffmpeg', [
+            '-hide_banner',
+            '-loglevel', 'error',
+            '-y',
+            '-ss', startPos,
+            '-i', inputPath,
+            '-t', duration,
+            '-c', 'copy',
+            outputPath
+        ])
+
+        const timer = setTimeout(() => {
+            try { ff.kill('SIGKILL') } catch {}
+            cleanup()
+            (reply || m.reply)('❌ Pemrosesan audio melebihi batas waktu (timeout).')
+        }, 30000)
+
+        ff.on('close', async (code) => {
+            clearTimeout(timer)
             try {
-                try { unlinkSync(inputPath) } catch {}
-                if (err) return (reply || m.reply)(`_*Error!*_`)
+                if (code !== 0 || !existsSync(outputPath)) {
+                    cleanup()
+                    return (reply || m.reply)('❌ Gagal memotong audio.')
+                }
 
                 let buff = readFileSync(outputPath)
+                cleanup()
+
                 await client.sendMessage(m.chat, {
                     audio: buff,
                     mimetype: 'audio/mpeg',
                     ptt: false
                 }, { quoted: m })
-
-                try { unlinkSync(outputPath) } catch {}
             } catch {
+                cleanup()
                 (reply || m.reply)('Error processing file')
             }
+        })
+
+        ff.on('error', () => {
+            clearTimeout(timer)
+            cleanup()
+            (reply || m.reply)('❌ Gagal menjalankan FFmpeg.')
         })
 
     } catch (e) {
