@@ -65,7 +65,7 @@ global.APIs = {
 }
 
 global.APIKeys = {
-  'https://api.kyzzz.xyz': 'YOUR-APIKEY' // Daftar dan dapatkan apikey gratis di https://api.kyzzz.xyz
+  'https://api.kyzzz.xyz': 'kyzz82980381291' // Daftar dan dapatkan apikey gratis di https://api.kyzzz.xyz
 }
 
 global.API = (name, path = '/', query = {}, apikeyqueryname) => {
